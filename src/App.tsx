@@ -1,7 +1,12 @@
-import LoginPage from './pages/LoginPage';
+import AppRouter from './routes/AppRouter';
+import { AuthProvider } from './contexts/AuthContext'; 
 
 function App() {
-  return <LoginPage />;
+  return (
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
+  );
 }
 
 export default App;
