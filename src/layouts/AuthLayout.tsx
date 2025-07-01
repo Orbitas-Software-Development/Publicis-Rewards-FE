@@ -4,7 +4,7 @@ import { styled } from '@mui/system';
 import { TypeAnimation } from 'react-type-animation';
 import { Outlet } from 'react-router-dom';
 import { useMediaQuery } from '@mui/material';
-import Header from '../components/Header';
+import Header from '../components/auth/Header';
 import background from '../assets/images/background.jpg';
 import huella from '../assets/images/huella3.png';
 

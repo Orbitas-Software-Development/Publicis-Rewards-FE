@@ -1,71 +1,108 @@
-import { createContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useState, useEffect, type ReactNode, useMemo } from 'react';
 import type { RewardsRole } from '../types/RewardsRole';
+
+interface User {
+  name: string;
+  email: string;
+  role: RewardsRole;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  role: RewardsRole | null;
+  user: User | null;
   token: string | null;
-  login: (token: string, role: RewardsRole) => void;
+  login: (token: string, user: User) => void;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
+// Keys
 const TOKEN_KEY = 'auth_token';
-const ROLE_KEY = 'auth_role';
+const USER_KEY = 'auth_user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
-  const [role, setRole] = useState<RewardsRole | null>(() => {
-    const savedRole = localStorage.getItem(ROLE_KEY);
-    if (!savedRole) return null;
-    try {
-      return JSON.parse(savedRole) as RewardsRole;
-    } catch {
-      return null;
-    }
-  });
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const isAuthenticated = !!token;
+  // Carga inicial segura
+  useEffect(() => {
+    const initializeAuth = () => {
+      const storedToken = localStorage.getItem(TOKEN_KEY);
+      const storedUser = localStorage.getItem(USER_KEY);
 
-  const login = (newToken: string, userRole: RewardsRole) => {
+      if (!storedToken || !storedUser) {
+        clearAuth();
+        return;
+      }
+
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (!parsedUser.name || !parsedUser.email || !parsedUser.role) throw new Error();
+
+        setToken(storedToken);
+        setUser(parsedUser);
+      } catch {
+        clearAuth();
+      }
+    };
+
+    initializeAuth();
+    setLoading(false);
+  }, []);
+
+  // Sincroniza entre pestañas
+  useEffect(() => {
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === TOKEN_KEY || event.key === USER_KEY) {
+        const newToken = localStorage.getItem(TOKEN_KEY);
+        const newUserRaw = localStorage.getItem(USER_KEY);
+
+        if (!newToken || !newUserRaw) {
+          clearAuth();
+          return;
+        }
+
+        try {
+          const parsedUser = JSON.parse(newUserRaw);
+          if (!parsedUser.name || !parsedUser.email || !parsedUser.role) throw new Error();
+
+          setToken(newToken);
+          setUser(parsedUser);
+        } catch {
+          clearAuth();
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const login = (newToken: string, newUser: User) => {
     setToken(newToken);
-    setRole(userRole);
+    setUser(newUser);
     localStorage.setItem(TOKEN_KEY, newToken);
-    localStorage.setItem(ROLE_KEY, JSON.stringify(userRole));
+    localStorage.setItem(USER_KEY, JSON.stringify(newUser));
   };
 
   const logout = () => {
-    setToken(null);
-    setRole(null);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(ROLE_KEY);
+    clearAuth();
   };
 
-  useEffect(() => {
-    function syncAuth(event: StorageEvent) {
-      if (event.key === TOKEN_KEY) {
-        setToken(event.newValue);
-      }
-      if (event.key === ROLE_KEY) {
-        if (!event.newValue) {
-          setRole(null);
-          return;
-        }
-        try {
-          const parsedRole = JSON.parse(event.newValue) as RewardsRole;
-          setRole(parsedRole);
-        } catch {
-          setRole(null);
-        }
-      }
-    }
-    window.addEventListener('storage', syncAuth);
-    return () => window.removeEventListener('storage', syncAuth);
-  }, []);
+  const clearAuth = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  };
+
+  const isAuthenticated = useMemo(() => !!token && !!user, [token, user]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, role, token, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

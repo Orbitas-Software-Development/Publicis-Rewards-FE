@@ -18,10 +18,12 @@ import type { UserAuthDto } from '../../types/UserAuth';
 import { Link as RouterLink } from 'react-router-dom';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function LoginPage() {
   const theme = useTheme();
+  const navigate = useNavigate();
   const { login } = useAuth();
   const [form, setForm] = useState<UserAuthDto>({ userName: '', password: '' });
   const [agreePolicy, setAgreePolicy] = useState(false);
@@ -39,40 +41,44 @@ export default function LoginPage() {
   };
 
 const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
-  setSuccess(null);
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
 
-  if (!agreePolicy) {
-    setError('Debes aceptar la Política del Programa Publicis Rewards.');
-    return;
-  }
+    if (!agreePolicy) {
+      setError('Debes aceptar la Política del Programa Publicis Rewards.');
+      return;
+    }
 
-  if (!form.userName || !form.password) {
-    setError('Por favor completa todos los campos.');
-    return;
-  }
+    if (!form.userName || !form.password) {
+      setError('Por favor completa todos los campos.');
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const result = await loginUser(form);
+    try {
+      const result = await loginUser(form);
 
-      const role = result.userToken.user.role;
-      login(result.userToken.token, role);
+      const { fullName, role, email } = result.userToken.user;
+      login(
+        result.userToken.token,
+        { name: fullName, role, email } 
+      );
+
       setSuccess(result.message);
 
-  }catch (err: unknown) {
-    if (err instanceof Error) {
-      setError(err.message); 
-    } else {
-      setError('Error al iniciar sesión');
+      navigate('/inicio');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Error al iniciar sesión');
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <>

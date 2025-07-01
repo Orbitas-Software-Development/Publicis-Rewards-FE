@@ -2,6 +2,10 @@ import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
   palette: {
+      background: {
+      default: '#F4F6F8', 
+      paper: '#ffffff',   
+    },
     publicisBlack: {
       main: '#212129',
       light: '#3d3d48',
@@ -41,7 +45,7 @@ const theme = createTheme({
 
     // Mapas estándar de MUI
     primary: {
-      main: '#16ABE0', // Publicis Blue
+      main: '#16ABE0', 
     },
     secondary: {
       main: '#9D833E', // Publicis Gold

@@ -1,7 +1,7 @@
 // src/components/Header.tsx
 
 import { Box, Link, Typography, useTheme } from '@mui/material';
-import logo from '../assets/images/logo.png'; 
+import logo from '../../assets/images/logo.png'; 
 
 export default function Header() {
   const theme = useTheme();
