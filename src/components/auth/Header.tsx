@@ -1,7 +1,7 @@
 // src/components/Header.tsx
 
 import { Box, Link, Typography, useTheme } from '@mui/material';
-import logo from '../../assets/images/logo.png'; 
+import logo from '../../assets/images/logo3.png'; 
 
 export default function Header() {
   const theme = useTheme();
@@ -20,7 +20,7 @@ export default function Header() {
         justifyContent: 'space-between',
         px: 3,
         backdropFilter: 'blur(10px)',
-        backgroundColor: 'rgba(0,0,0,0.8)',
+        backgroundColor: 'rgba(0,0,0,0.9)',
         color: theme.palette.publicisGrey.light,
         zIndex: 20,
         boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
@@ -31,7 +31,7 @@ export default function Header() {
         component="img"
         src={logo}
         alt="Logo de la empresa"
-        sx={{ height: 40, cursor: 'pointer' }}
+        sx={{ height:{xs:60, sm:70, md:80}, cursor: 'pointer' }}
         onClick={() => window.location.href = '/'}
       />
 

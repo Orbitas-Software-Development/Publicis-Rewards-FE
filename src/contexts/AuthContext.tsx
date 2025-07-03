@@ -1,4 +1,10 @@
-import { createContext, useState, useEffect, type ReactNode, useMemo } from 'react';
+import {
+  createContext,
+  useState,
+  useEffect,
+  useMemo,
+  type ReactNode,
+} from 'react';
 import type { RewardsRole } from '../types/RewardsRole';
 
 interface User {
@@ -18,16 +24,22 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-// Keys
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
+
+let broadcast: BroadcastChannel | null = null;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Carga inicial segura
+  // Inicializa canal
+  if (!broadcast) {
+    broadcast = new BroadcastChannel('auth_channel');
+  }
+
+  // Inicializa desde localStorage
   useEffect(() => {
     const initializeAuth = () => {
       const storedToken = localStorage.getItem(TOKEN_KEY);
@@ -41,7 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const parsedUser = JSON.parse(storedUser);
         if (!parsedUser.name || !parsedUser.email || !parsedUser.role) throw new Error();
-
         setToken(storedToken);
         setUser(parsedUser);
       } catch {
@@ -53,32 +64,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  // Sincroniza entre pestañas
+  // Reacción a mensajes del canal
   useEffect(() => {
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === TOKEN_KEY || event.key === USER_KEY) {
-        const newToken = localStorage.getItem(TOKEN_KEY);
-        const newUserRaw = localStorage.getItem(USER_KEY);
+    const handleBroadcast = (event: MessageEvent) => {
+      const { type, token: newToken, user: newUser } = event.data;
 
-        if (!newToken || !newUserRaw) {
-          clearAuth();
-          return;
-        }
-
-        try {
-          const parsedUser = JSON.parse(newUserRaw);
-          if (!parsedUser.name || !parsedUser.email || !parsedUser.role) throw new Error();
-
-          setToken(newToken);
-          setUser(parsedUser);
-        } catch {
-          clearAuth();
-        }
+      if (type === 'login') {
+        setToken(newToken);
+        setUser(newUser);
+      } else if (type === 'logout') {
+        clearAuth();
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    broadcast?.addEventListener('message', handleBroadcast);
+    return () => broadcast?.removeEventListener('message', handleBroadcast);
   }, []);
 
   const login = (newToken: string, newUser: User) => {
@@ -86,10 +86,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(newUser);
     localStorage.setItem(TOKEN_KEY, newToken);
     localStorage.setItem(USER_KEY, JSON.stringify(newUser));
+    broadcast?.postMessage({ type: 'login', token: newToken, user: newUser });
   };
 
   const logout = () => {
     clearAuth();
+    broadcast?.postMessage({ type: 'logout' });
   };
 
   const clearAuth = () => {

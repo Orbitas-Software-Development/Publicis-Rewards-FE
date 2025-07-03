@@ -67,8 +67,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       );
 
       setSuccess(result.message);
-
-      navigate('/inicio');
+      setTimeout(() => navigate('/inicio'), 1000);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

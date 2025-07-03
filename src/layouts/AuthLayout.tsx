@@ -5,10 +5,11 @@ import { TypeAnimation } from 'react-type-animation';
 import { Outlet } from 'react-router-dom';
 import { useMediaQuery } from '@mui/material';
 import Header from '../components/auth/Header';
-import background from '../assets/images/background.jpg';
-import huella from '../assets/images/huella3.png';
+import background from '../assets/images/background2.jpg';
+import huella from '../assets/images/huella6.png';
 
 const BackgroundContainer = styled('div')({
+  position: 'relative',
   minHeight: '100vh',
   backgroundImage: `url(${background})`,
   backgroundSize: 'cover',
@@ -17,7 +18,24 @@ const BackgroundContainer = styled('div')({
   justifyContent: 'center',
   alignItems: 'center',
   padding: '2rem',
+  overflow: 'hidden',
+
+  // Pseudo-elemento overlay oscuro
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', 
+    backdropFilter: 'blur(2px)', 
+    zIndex: 1,
+  },
+
+
 });
+
 
 const GlassBox = styled(Box)(({ theme }) => ({
   backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -32,6 +50,7 @@ const GlassBox = styled(Box)(({ theme }) => ({
   backdropFilter: 'blur(5px)',
   color: theme.palette.publicisGrey.light,
   marginTop: '80px',
+  zIndex: 2
 }));
 
 const ContentRow = styled(Box)(({ theme }) => ({
@@ -119,7 +138,7 @@ export default function AuthLayout() {
               />
             </Box>
             <Typography variant="caption" sx={{ color: theme.palette.publicisGrey.main, textAlign: 'center' }}>
-              © 2025 Publicis. Todos los derechos reservados.
+              © 2025 Publicis Groupe. Todos los derechos reservados.
             </Typography>
           </ImageSection>
         </ContentRow>

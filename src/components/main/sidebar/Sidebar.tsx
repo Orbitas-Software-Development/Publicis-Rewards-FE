@@ -14,7 +14,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import avatarImage from '../../../assets/images/huella2.png';
-import logoImage from '../../../assets/images/logo.png'; 
+import logoImage from '../../../assets/images/logo2.png'; 
 import { useAuth } from '../../../hooks/useAuth';
 import SidebarMenu from './SidebarMenu';
 
@@ -166,7 +166,7 @@ export default function Sidebar({ mobileOpen, onDrawerToggle }: SidebarProps) {
         <img
           src={logoImage}
           alt="Logo"
-          style={{ maxWidth: '100%', height: 60, objectFit: 'contain' }}
+          style={{ maxWidth: '100%', height: 80, objectFit: 'contain' }}
         />
       </Box>
     </Box>

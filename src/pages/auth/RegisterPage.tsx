@@ -45,6 +45,15 @@ export default function RegisterPage() {
       return;
     }
 
+    const password = form.password;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,})/;
+
+    if (!passwordRegex.test(password)) {
+      setError('La contraseña debe tener al menos 8 caracteres, una letra mayúscula y un carácter especial.');
+      return;
+    }
+
+
     setLoading(true);
     try {
       const result = await registerUser(form);

@@ -7,10 +7,13 @@ import {
   Alert,
   CircularProgress,
   useTheme,
-  Link
+  Link,
+  InputAdornment,
+  IconButton,
 } from '@mui/material';
 import { useSearchParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { resetPassword } from '../../services/authService';
 
 export default function ResetPasswordPage() {
@@ -20,6 +23,8 @@ export default function ResetPasswordPage() {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -87,7 +92,7 @@ export default function ResetPasswordPage() {
           fullWidth
           variant="outlined"
           label="Nueva contraseña"
-          type="password"
+          type={showNewPassword ? 'text' : 'password'}
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           slotProps={{
@@ -96,6 +101,20 @@ export default function ResetPasswordPage() {
                 fontFamily: 'Gotham Narrow',
                 fontWeight: 400,
                 color: theme.palette.publicisGrey.dark,
+              },
+            },
+             input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowNewPassword((prev) => !prev)} edge="end"  sx={{ color: theme.palette.publicisGrey.light }}>
+                    {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+              sx: {
+                '&::-ms-reveal, &::-ms-clear': {
+                  display: 'none',
+                },
               },
             },
           }}
@@ -129,7 +148,7 @@ export default function ResetPasswordPage() {
           fullWidth
           variant="outlined"
           label="Confirmar contraseña"
-          type="password"
+          type={showConfirmPassword ? 'text' : 'password'}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           slotProps={{
@@ -138,6 +157,20 @@ export default function ResetPasswordPage() {
                 fontFamily: 'Gotham Narrow',
                 fontWeight: 400,
                 color: theme.palette.publicisGrey.dark,
+              },
+            },
+              input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowConfirmPassword((prev) => !prev)} edge="end" sx={{ color: theme.palette.publicisGrey.light }}>
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+              sx: {
+                '&::-ms-reveal, &::-ms-clear': {
+                  display: 'none',
+                },
               },
             },
           }}
@@ -212,13 +245,7 @@ export default function ResetPasswordPage() {
             underline="hover"
             sx={{ ml: 0.5, display: 'flex', alignItems: 'center' }}
           >
-            <Typography
-              variant="body2"
-              sx={{
-                fontSize: 16,
-                fontWeight: 500
-              }}
-            >
+            <Typography variant="body2" sx={{ fontSize: 16, fontWeight: 500 }}>
               Volver al inicio de sesión
             </Typography>
           </Link>
