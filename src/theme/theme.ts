@@ -51,7 +51,10 @@ const theme = createTheme({
       main: '#9D833E', // Publicis Gold
     },
     error: {
-      main: '#D93D7A', // Publicis Pink
+      light: '#FF563028',
+      main: '#FF5630',
+      dark: '#B71D18',
+      contrastText: '#FFFFFF',
     },
     warning: {
       main: '#9D833E', // Publicis Gold
@@ -60,7 +63,10 @@ const theme = createTheme({
       main: '#00B0A3', // Publicis Turquoise
     },
     success: {
-      main: '#00B0A3', // Publicis Turquoise
+      light: '#22C55E28',
+      main: '#22C55E',
+      dark: '#118D57',
+      contrastText: '#ffffff',
     },
   },
 typography: {

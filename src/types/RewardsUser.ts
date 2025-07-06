@@ -5,9 +5,9 @@ export interface RewardsUser {
   employeeNumber: string;
   fullName: string;
   email: string;
-  hireDate: string; 
+  hireDate: string;
   status: string;
-  roleId: number;
   createdAt: string;
-  role: RewardsRole;
+
+  roles: RewardsRole[];
 }

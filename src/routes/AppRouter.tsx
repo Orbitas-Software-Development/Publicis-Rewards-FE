@@ -9,6 +9,8 @@ import MainLayout from '../layouts/MainLayout';
 import HomePage from '../pages/main/HomePage';
 import SettingsPage from '../pages/main/SettingsPage';
 import { ProtectedRoute } from './ProtectedRoute';
+import EmployeesPage from '../pages/main/EmployeesPage';
+import TeamPage from '../pages/main/TeamPage';
 
 export default function AppRouter() {
   return (
@@ -28,7 +30,7 @@ export default function AppRouter() {
           <Route
             path="inicio"
             element={
-              <ProtectedRoute roles={['Administrador', 'Supervisor', 'Colaborador']}>
+              <ProtectedRoute roles={['Administrador', 'Supervisor','Manager', 'Colaborador']}>
                 <HomePage />
               </ProtectedRoute>
             }
@@ -37,14 +39,14 @@ export default function AppRouter() {
             path="colaboradores"
             element={
               <ProtectedRoute roles={['Administrador']}>
-                <HomePage />
+                <EmployeesPage />
               </ProtectedRoute>
             }
           />
            <Route
             path="huellas"
             element={
-              <ProtectedRoute roles={['Administrador', 'Supervisor']}>
+              <ProtectedRoute roles={['Administrador', 'Manager']}>
                 <HomePage /> {/* Aquí podrías tener un layout específico para huellas */}
               </ProtectedRoute>
             }
@@ -52,7 +54,7 @@ export default function AppRouter() {
             <Route
               path="asignar"
               element={
-                <ProtectedRoute roles={['Administrador', 'Supervisor']}>
+                <ProtectedRoute roles={['Administrador', 'Manager']}>
                      <HomePage />
                 </ProtectedRoute>
               }
@@ -60,7 +62,7 @@ export default function AppRouter() {
             <Route
               path="categorias"
               element={
-                <ProtectedRoute roles={['Administrador', 'Supervisor']}>
+                <ProtectedRoute roles={['Administrador']}>
                      <HomePage />
                 </ProtectedRoute>
               }
@@ -77,7 +79,7 @@ export default function AppRouter() {
           <Route
             path="reportes"
             element={
-              <ProtectedRoute roles={['Administrador', 'Supervisor']}>
+              <ProtectedRoute roles={['Administrador', 'Supervisor', 'Manager']}>
                 <HomePage />
               </ProtectedRoute>
             }
@@ -93,8 +95,8 @@ export default function AppRouter() {
           <Route
             path="equipo"
             element={
-              <ProtectedRoute roles={['Supervisor']}>
-                <HomePage />
+              <ProtectedRoute roles={['Supervisor','Manager']}>
+                <TeamPage/>
               </ProtectedRoute>
             }
           />

@@ -122,7 +122,7 @@ export default function Sidebar({ mobileOpen, onDrawerToggle }: SidebarProps) {
                   {user?.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {user?.role.name}
+                  {user?.activeRole.name}
                 </Typography>
               </Box>
               <IconButton
@@ -158,7 +158,7 @@ export default function Sidebar({ mobileOpen, onDrawerToggle }: SidebarProps) {
         </Typography>
 
        {/* Navegación */}
-        <SidebarMenu role={user?.role.name ?? 'colaborador'} />
+        <SidebarMenu role={user?.activeRole?.name ?? 'colaborador'} />
       </Box>
 
       {/* Parte inferior: logo */}

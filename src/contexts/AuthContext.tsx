@@ -8,9 +8,11 @@ import {
 import type { RewardsRole } from '../types/RewardsRole';
 
 interface User {
+  employeeNumber: string,
   name: string;
   email: string;
-  role: RewardsRole;
+  roles: RewardsRole[];
+  activeRole: RewardsRole;
 }
 
 interface AuthContextType {
@@ -34,12 +36,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Inicializa canal
   if (!broadcast) {
     broadcast = new BroadcastChannel('auth_channel');
   }
 
-  // Inicializa desde localStorage
   useEffect(() => {
     const initializeAuth = () => {
       const storedToken = localStorage.getItem(TOKEN_KEY);
@@ -51,8 +51,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const parsedUser = JSON.parse(storedUser);
-        if (!parsedUser.name || !parsedUser.email || !parsedUser.role) throw new Error();
+        const parsedUser: User = JSON.parse(storedUser);
+        if (
+          !parsedUser.name ||
+          !parsedUser.email ||
+          !Array.isArray(parsedUser.roles)
+        ) {
+          throw new Error('Invalid user');
+        }
+
         setToken(storedToken);
         setUser(parsedUser);
       } catch {
@@ -64,7 +71,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  // Reacción a mensajes del canal
   useEffect(() => {
     const handleBroadcast = (event: MessageEvent) => {
       const { type, token: newToken, user: newUser } = event.data;
@@ -81,13 +87,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => broadcast?.removeEventListener('message', handleBroadcast);
   }, []);
 
-  const login = (newToken: string, newUser: User) => {
-    setToken(newToken);
-    setUser(newUser);
-    localStorage.setItem(TOKEN_KEY, newToken);
-    localStorage.setItem(USER_KEY, JSON.stringify(newUser));
-    broadcast?.postMessage({ type: 'login', token: newToken, user: newUser });
+  const login = (newToken: string, newUser: Omit<User, 'activeRole'>) => {
+  if (!newUser.roles || newUser.roles.length === 0) {
+    throw new Error('El usuario no tiene roles asignados.');
+  }
+
+  const activeRole = newUser.roles[0];
+
+  const userWithActiveRole: User = {
+    ...newUser,
+    activeRole,
   };
+
+  setToken(newToken);
+  setUser(userWithActiveRole);
+  localStorage.setItem(TOKEN_KEY, newToken);
+  localStorage.setItem(USER_KEY, JSON.stringify(userWithActiveRole));
+  broadcast?.postMessage({
+    type: 'login',
+    token: newToken,
+    user: userWithActiveRole,
+  });
+};
+
+
 
   const logout = () => {
     clearAuth();

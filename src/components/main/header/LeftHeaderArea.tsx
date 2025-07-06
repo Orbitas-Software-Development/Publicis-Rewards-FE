@@ -37,7 +37,7 @@ export default function LeftHeaderArea() {
   const [query, setQuery] = useState('');
   const [showFloatingSearch, setShowFloatingSearch] = useState(false);
 
-  const role = (user?.role?.name?.toLowerCase() ?? 'colaborador') as RoleKey;
+  const role = (user?.activeRole.name.toLowerCase() ?? 'colaborador') as RoleKey;
   const pages = menuConfig[role] ?? [];
 
   // Cerrar el buscador si se hace clic fuera

@@ -191,8 +191,12 @@ export default function RegisterPage() {
           }}
         />
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+        {error && (
+            <Alert severity="error" sx={{ mb: 2, color:theme.palette.publicisGrey.main }}>
+              {error}
+            </Alert>
+          )}
+          {success && <Alert severity="success" sx={{ mb: 2, color:theme.palette.publicisGrey.main}}>{success}</Alert>}
 
         <Button
           type="submit"

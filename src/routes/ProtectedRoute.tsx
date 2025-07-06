@@ -5,14 +5,14 @@ import { Box, CircularProgress } from '@mui/material';
 
 interface Props {
   children: ReactNode;
-  roles?: string[];
+  roles?: string[]; // roles requeridos
 }
 
 export function ProtectedRoute({ children, roles }: Props) {
   const { isAuthenticated, user, loading } = useAuth();
   const location = useLocation();
 
-   if (loading) {
+  if (loading) {
     return (
       <Box
         sx={{
@@ -31,11 +31,10 @@ export function ProtectedRoute({ children, roles }: Props) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Autenticado pero sin permiso
-  if (roles && (!user || !roles.includes(user.role.name))) {
-    // Redirige a una ruta por defecto o muestra un acceso denegado
+  // Validar roles
+  if (roles && (!user || !roles.includes(user.activeRole.name))) {
     return <Navigate to="/inicio" replace />;
-    // O puedes mostrar un componente de acceso denegado:
+    // O retornar un componente de acceso denegado:
     // return <AccessDenied />;
   }
 

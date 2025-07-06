@@ -41,43 +41,53 @@ export default function LoginPage() {
   };
 
 const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
+  e.preventDefault();
+  setError(null);
+  setSuccess(null);
 
-    if (!agreePolicy) {
-      setError('Debes aceptar la Política del Programa Publicis Rewards.');
+  if (!agreePolicy) {
+    setError('Debes aceptar la Política del Programa Publicis Rewards.');
+    return;
+  }
+
+  if (!form.userName || !form.password) {
+    setError('Por favor completa todos los campos.');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const result = await loginUser(form);
+    const {employeeNumber, fullName, email, roles } = result.userToken.user;
+
+    if (!roles || roles.length === 0) {
+      setError('El usuario no tiene roles asignados.');
       return;
     }
 
-    if (!form.userName || !form.password) {
-      setError('Por favor completa todos los campos.');
-      return;
+    login(result.userToken.token, {
+      employeeNumber: employeeNumber,
+      name: fullName,
+      email,
+      roles,
+      activeRole: roles[0],  
+    });
+
+    setSuccess(result.message);
+    setTimeout(() => navigate('/inicio'), 1000);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      setError(err.message);
+    } else {
+      setError('Error al iniciar sesión');
     }
+  } finally {
+    setLoading(false);
+  }
+};
 
-    setLoading(true);
 
-    try {
-      const result = await loginUser(form);
-
-      const { fullName, role, email } = result.userToken.user;
-      login(
-        result.userToken.token,
-        { name: fullName, role, email } 
-      );
-
-      setSuccess(result.message);
-      setTimeout(() => navigate('/inicio'), 1000);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Error al iniciar sesión');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <>
@@ -229,11 +239,11 @@ const handleSubmit = async (e: React.FormEvent) => {
         />
 
           {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert severity="error" sx={{ mb: 2, color:theme.palette.publicisGrey.main }}>
               {error}
             </Alert>
           )}
-          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+          {success && <Alert severity="success" sx={{ mb: 2, color:theme.palette.publicisGrey.main}}>{success}</Alert>}
 
         <Button
           type="submit"

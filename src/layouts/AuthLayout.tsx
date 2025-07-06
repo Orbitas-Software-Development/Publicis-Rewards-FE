@@ -20,7 +20,6 @@ const BackgroundContainer = styled('div')({
   padding: '2rem',
   overflow: 'hidden',
 
-  // Pseudo-elemento overlay oscuro
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -138,7 +137,7 @@ export default function AuthLayout() {
               />
             </Box>
             <Typography variant="caption" sx={{ color: theme.palette.publicisGrey.main, textAlign: 'center' }}>
-              © 2025 Publicis Groupe. Todos los derechos reservados.
+              © 2025 Re:Sources. Todos los derechos reservados.
             </Typography>
           </ImageSection>
         </ContentRow>

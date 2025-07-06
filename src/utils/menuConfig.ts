@@ -4,7 +4,7 @@ export interface Page {
   children?: Page[];
 }
 
-export type RoleKey = 'administrador' | 'supervisor' | 'colaborador';
+export type RoleKey = 'administrador' | 'supervisor' | 'manager' | 'colaborador';
 
 export const menuConfig: Record<RoleKey, Page[]> = {
   administrador: [
@@ -23,6 +23,11 @@ export const menuConfig: Record<RoleKey, Page[]> = {
     { label: 'Configuración', path: '/configuracion' },
   ],
   supervisor: [
+    { label: 'Inicio', path: '/inicio' },
+    { label: 'Mi Equipo', path: '/equipo' },
+    { label: 'Reportes', path: '/reportes' },
+  ],
+  manager: [
     { label: 'Inicio', path: '/inicio' },
     { label: 'Mi Equipo', path: '/equipo' },
     { label: 'Asignar Huellas', path: '/huellas' },
