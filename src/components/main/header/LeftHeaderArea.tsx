@@ -59,7 +59,6 @@ export default function LeftHeaderArea() {
     };
   }, [showFloatingSearch]);
 
-  // Autofocus al abrir
   useEffect(() => {
     if (showFloatingSearch) {
       const input = document.getElementById('floating-search-input');
@@ -67,7 +66,6 @@ export default function LeftHeaderArea() {
     }
   }, [showFloatingSearch]);
 
-  // Función recursiva para buscar en todas las rutas y subrutas
   const findMatchingPath = (
     items: typeof pages,
     query: string
@@ -84,7 +82,6 @@ export default function LeftHeaderArea() {
     return null;
   };
 
-  // Buscar y redirigir
   const handleSearch = () => {
     const trimmedQuery = query.trim().toLowerCase();
 
@@ -124,7 +121,7 @@ export default function LeftHeaderArea() {
               display: 'flex',
               alignItems: 'center',
               px: 1.5,
-              py: 0.5,
+              py: 0.4,
               backgroundColor: theme.palette.publicisGrey.main,
               borderRadius: 1,
             }}

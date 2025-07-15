@@ -57,7 +57,7 @@ export default function ResetPasswordPage() {
     try {
       const response = await resetPassword({ email, token, newPassword });
       setSuccess(response.message);
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate('/iniciar-sesion'), 3000);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Ocurrió un error.');
     } finally {
@@ -237,7 +237,7 @@ export default function ResetPasswordPage() {
           <ArrowBackIosNewIcon fontSize="small" />
           <Link
             component={RouterLink}
-            to="/login"
+            to="/iniciar-sesion"
             underline="hover"
             sx={{ ml: 0.5, display: 'flex', alignItems: 'center' }}
           >

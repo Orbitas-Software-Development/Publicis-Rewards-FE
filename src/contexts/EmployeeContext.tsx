@@ -35,7 +35,6 @@ export function EmployeeProvider({ children }: { children: ReactNode }) {
 
   const fetchData = useCallback(async () => {
     if (!user || user.activeRole?.id !== 1) return;
-
     try {
       setLoading(true);
       const data = await fetchAllEmployees();

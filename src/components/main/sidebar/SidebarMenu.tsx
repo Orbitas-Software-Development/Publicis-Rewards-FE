@@ -7,15 +7,19 @@ import {
   Collapse,
 } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
-import HomeIcon from '@mui/icons-material/Home';
-import PeopleIcon from '@mui/icons-material/People';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import SettingsIcon from '@mui/icons-material/Settings';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import { IoHome } from "react-icons/io5";
+import { IoIosPeople } from "react-icons/io";
+import { PiPawPrintFill } from "react-icons/pi";
+import { BiSolidCategory } from "react-icons/bi";
+import { HiTrophy } from "react-icons/hi2";
+import { GiTeamIdea } from "react-icons/gi";
+import { BiSolidReport } from "react-icons/bi";
+import { RiFileHistoryFill } from "react-icons/ri";
+import { MdOutlineMenuBook } from "react-icons/md";
+import { FaUsers } from "react-icons/fa6";
+import { RiSettings5Fill } from "react-icons/ri";
 
 import type { RoleKey, Page } from '../../../utils/menuConfig';
 import { menuConfig } from '../../../utils/menuConfig';
@@ -26,18 +30,19 @@ type SidebarMenuProps = {
 
 // Mapeo de íconos para paths (incluye subitems)
 const iconMap: Record<string, React.ReactNode> = {
-  inicio: <HomeIcon />,
-  colaboradores: <PeopleIcon />,
-  equipo: <PeopleIcon />,
-  'mis-huellas': <FavoriteIcon />,
-  huellas: <FavoriteIcon />,
-  asignar: <FavoriteIcon />,  
-  categorias: <CardGiftcardIcon />, 
-  premios: <CardGiftcardIcon />,
-  catalogo: <CardGiftcardIcon />,
-  reportes: <AssessmentIcon />,
-  configuracion: <SettingsIcon />,
-  historial: <EmojiEventsIcon />,
+  inicio: <IoHome size={22} />,
+  colaboradores: <IoIosPeople size={24} />,
+  usuarios: <FaUsers size={24}/>,
+  equipo: <GiTeamIdea size={24} />,
+  'mis-huellas': <PiPawPrintFill size={24}/>,
+  huellas: <PiPawPrintFill size={24}/>,
+  asignar: <PiPawPrintFill size={22}/>,  
+  categorias: <BiSolidCategory size={22}/>, 
+  premios: <HiTrophy size={24} />,
+  catalogo: <MdOutlineMenuBook size={24}/>,
+  reportes: <BiSolidReport size={24}/>,
+  configuracion: <RiSettings5Fill size={24}/>,
+  historial: <RiFileHistoryFill size={24}/>,
 };
 
 // Función para obtener la última parte del path para asignar icono
@@ -67,13 +72,11 @@ export default function SidebarMenu({ role }: SidebarMenuProps) {
       const key = path.replace(/^\//, '').toLowerCase();
       const iconKey = getIconKey(path);
 
-      // Activo si ruta actual es igual o está dentro del path (para subitems)
       const isActive =
         activePath === path.toLowerCase() ||
         activePath.startsWith(path.toLowerCase() + '/');
 
       const hasChildren = Array.isArray(children) && children.length > 0;
-      // Mostrar abierto si está en openMenus o si está activo (por ruta)
       const isOpen = openMenus[path] ?? isActive;
 
       if (hasChildren) {
@@ -85,7 +88,7 @@ export default function SidebarMenu({ role }: SidebarMenuProps) {
               sx={{
                 mb: 0.5,
                 borderRadius: 1,
-                pl: 2 + level * 2, // indentación progresiva
+                pl: 2 + level * 2,
                 color: isActive ? 'primary.main' : 'text.secondary',
                 bgcolor: isActive ? 'action.selected' : 'transparent',
                 '&:hover': { bgcolor: 'action.hover' },
@@ -114,7 +117,6 @@ export default function SidebarMenu({ role }: SidebarMenuProps) {
         );
       }
 
-      // Item normal, link navegable
       return (
         <ListItemButton
           key={key}

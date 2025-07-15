@@ -14,12 +14,13 @@ export const menuConfig: Record<RoleKey, Page[]> = {
       label: 'Huellas',
       path: '/huellas',
       children: [
-        { label: 'Asignar Huellas', path: '/huellas/asignar' },
+        { label: 'Asignar', path: '/huellas/asignar' },
         { label: 'Categorías', path: '/huellas/categorias' },
       ],
     },
     { label: 'Premios', path: '/premios' },
     { label: 'Reportes', path: '/reportes' },
+    { label: 'Usuarios', path: '/usuarios' },
     { label: 'Configuración', path: '/configuracion' },
   ],
   supervisor: [

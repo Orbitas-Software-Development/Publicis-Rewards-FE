@@ -10,15 +10,15 @@ import {
   Typography,
   useTheme,
   useMediaQuery,
-  Card,
-  TablePagination,
 } from '@mui/material';
 import type { EmployeeDto } from '../../types/Employee';
 import { EmployeeTableToolbar } from '../../components/main/employee/EmployeeTableToolbar';
 import { TableSortLabel } from '@mui/material';
 import { useEmployees } from '../../hooks/useEmployee';
-import FullPageLoader from '../../components/main/FullPageLoader';
-import ErrorMessage from '../../components/main/ErrorMessage';
+import FullPageLoader from '../../components/main/utils/FullPageLoader';
+import ErrorMessage from '../../components/main/utils/ErrorMessage';
+import TableCardContainer from '../../components/main/table/TableCardContainer';
+import Pagination from '../../components/main/table/Pagination';
 
 
 export default function EmployeesPage() {
@@ -102,8 +102,6 @@ const handleSort = (property: typeof sortBy) => {
 
   const isShortResult = currentItems.length > 0 && currentItems.length < 6;
 
-
-
   if (loading) return <FullPageLoader />;
 
   if (error) {
@@ -123,30 +121,28 @@ const handleSort = (property: typeof sortBy) => {
         overflow: isDesktop ? 'hidden' : 'visible',
       }}
     >
-      <Typography
-        variant="h3"
-        fontWeight="bold"
-        color="primary.dark"
-        textAlign="center"
-        px={2}
-        pt={1}
-        sx={{ width: '100%', fontSize: 'clamp(1.7rem, 4vw, 2.1rem)' }}
-      >
-        Listado de Colaboradores
-      </Typography>
+      <Box px={2} pt={1}>
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+          color="primary.dark"
+          textAlign="left"
+          sx={{ fontSize: 'clamp(1.7rem, 4vw, 2rem)' }}
+        >
+          Listado de Colaboradores
+        </Typography>
 
-      <Card
-        sx={{
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: '16px',
-            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
-            backgroundColor: 'background.paper',
-            mx: 2,
-            height: '100%', 
-        }}
-      >
+        <Typography
+          variant="subtitle1"
+          color="text.secondary"
+          mt={0.5}
+        >
+          Consulta y gestiona la información de los empleados registrados.
+        </Typography>
+      </Box>
+
+
+      <TableCardContainer>
         <EmployeeTableToolbar
         filterValue={filterText}
         onFilterChange={(e) => {
@@ -193,7 +189,7 @@ const handleSort = (property: typeof sortBy) => {
                     Número de Empleado
                     </Typography>
                 </TableSortLabel>
-                </TableCell>
+              </TableCell>
 
                 <TableCell sortDirection={sortBy === 'fullName' ? sortOrder : false} sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
                 <TableSortLabel
@@ -208,27 +204,27 @@ const handleSort = (property: typeof sortBy) => {
                 </TableCell>
 
                 <TableCell sortDirection={sortBy === 'email' ? sortOrder : false} sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
-                <TableSortLabel
-                    active={sortBy === 'email'}
-                    direction={sortBy === 'email' ? sortOrder : 'asc'}
-                    onClick={() => handleSort('email')}
-                >
-                    <Typography variant="subtitle2" fontWeight={sortBy === 'email' ? 'bold' : '500'} fontSize={16}>
-                    Correo
-                    </Typography>
-                </TableSortLabel>
+                  <TableSortLabel
+                      active={sortBy === 'email'}
+                      direction={sortBy === 'email' ? sortOrder : 'asc'}
+                      onClick={() => handleSort('email')}
+                  >
+                      <Typography variant="subtitle2" fontWeight={sortBy === 'email' ? 'bold' : '500'} fontSize={16}>
+                      Correo
+                      </Typography>
+                  </TableSortLabel>
                 </TableCell>
 
                 <TableCell sortDirection={sortBy === 'hireDate' ? sortOrder : false} sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
-                <TableSortLabel
-                    active={sortBy === 'hireDate'}
-                    direction={sortBy === 'hireDate' ? sortOrder : 'asc'}
-                    onClick={() => handleSort('hireDate')}
-                >
-                    <Typography variant="subtitle2" fontWeight={sortBy === 'hireDate' ? 'bold' : '500'} fontSize={16}>
-                    Fecha de Ingreso
-                    </Typography>
-                </TableSortLabel>
+                  <TableSortLabel
+                      active={sortBy === 'hireDate'}
+                      direction={sortBy === 'hireDate' ? sortOrder : 'asc'}
+                      onClick={() => handleSort('hireDate')}
+                  >
+                      <Typography variant="subtitle2" fontWeight={sortBy === 'hireDate' ? 'bold' : '500'} fontSize={16}>
+                      Fecha de Ingreso
+                      </Typography>
+                  </TableSortLabel>
                 </TableCell>
 
                 <TableCell sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
@@ -307,18 +303,15 @@ const handleSort = (property: typeof sortBy) => {
         </TableContainer>
 
         <Box sx={{ px: 2 }}>
-            <TablePagination
-            component="div"
-            count={filteredEmployees.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 20, 50]}
-            labelRowsPerPage="Filas por página"
-            />
+           <Pagination
+              count={filteredEmployees.length}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </Box>
-      </Card>
+      </TableCardContainer>
     </Box>
   );
 }

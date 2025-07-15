@@ -12,12 +12,14 @@ import {
 import { useState } from 'react';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
-import avatarImage from '../../../assets/images/huella2.png';
 import { useAuth } from '../../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../../../utils/ApiLinks';
 
 
 export default function AccountPopover() {
   const { user, logout} = useAuth();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -28,9 +30,11 @@ export default function AccountPopover() {
 
   const handleNavigate = (path: string) => {
     handleClose();
-    // Aquí puedes usar navigate(path) si usas react-router-dom
-    console.log('Navegar a:', path);
+    navigate(path);
   };
+
+  const baseUrl = API_URL.endsWith('/api') ? API_URL.slice(0, -4) : API_URL;
+
 
   return (
     <>
@@ -44,7 +48,7 @@ export default function AccountPopover() {
             `conic-gradient(${theme.palette.publicisBlue.light}, ${theme.palette.publicisPink.light}, ${theme.palette.publicisBlue.light})`,
         }}
       >
-        <Avatar src={avatarImage} alt={user?.name} sx={{ width: 1, height: 1 }} />
+        <Avatar src={`${baseUrl}${user?.profilePicture}`} alt={user?.name} sx={{ width: 1, height: 1 }} />
       </IconButton>
 
       <Popover
@@ -71,14 +75,14 @@ export default function AccountPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <MenuList sx={{ p: 1, gap: 0.5 }}>
-          <MenuItem onClick={() => handleNavigate('/profile')} sx={{ pl: 1 }}>
+          <MenuItem onClick={() => handleNavigate(`/perfil/${user?.id}`)} sx={{ pl: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <PersonIcon fontSize="small" />
               <Typography variant="subtitle2" >Mi perfil</Typography>
             </Box>
           </MenuItem>
 
-          <MenuItem onClick={() => handleNavigate('/settings')} sx={{ pl: 1 }}>
+          <MenuItem onClick={() =>  handleNavigate(`/configuracion`)}  sx={{ pl: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <SettingsIcon fontSize="small" />
               <Typography variant="subtitle2">Ajustes</Typography>

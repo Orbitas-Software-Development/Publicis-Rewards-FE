@@ -28,7 +28,7 @@ export function ProtectedRoute({ children, roles }: Props) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/iniciar-sesion" state={{ from: location }} replace />;
   }
 
   // Validar roles

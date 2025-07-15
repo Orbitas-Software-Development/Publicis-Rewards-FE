@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles';
+import { alpha, createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
   palette: {
@@ -57,7 +57,9 @@ const theme = createTheme({
       contrastText: '#FFFFFF',
     },
     warning: {
-      main: '#9D833E', // Publicis Gold
+      main: '#9D833E',       // Publicis Gold
+      light: '#FFE399',      // Tono claro amarillo-naranja para fondo (degradado suave)
+      dark: '#5C4A1F',       // Tono oscuro para texto
     },
     info: {
       main: '#00B0A3', // Publicis Turquoise
@@ -67,6 +69,11 @@ const theme = createTheme({
       main: '#22C55E',
       dark: '#118D57',
       contrastText: '#ffffff',
+    },
+    action: {
+      selected: alpha('#16ABE0', 0.12), 
+      hover: alpha('#16ABE0', 0.06),    
+      focus: alpha('#00B0A3', 0.12), 
     },
   },
 typography: {

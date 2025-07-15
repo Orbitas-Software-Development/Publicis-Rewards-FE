@@ -11,6 +11,11 @@ import SettingsPage from '../pages/main/SettingsPage';
 import { ProtectedRoute } from './ProtectedRoute';
 import EmployeesPage from '../pages/main/EmployeesPage';
 import TeamPage from '../pages/main/TeamPage';
+import UsersPage from '../pages/main/UsersPage';
+import UserProfilePage from '../pages/main/UserProfilePage';
+import BadgeCategoriesPage from '../pages/main/BadgeCategoriesPage';
+import BadgeLayout from '../layouts/BadgeLayout';
+import PrizesPage from '../pages/main/PrizesPage';
 
 export default function AppRouter() {
   return (
@@ -19,10 +24,10 @@ export default function AppRouter() {
         {/* Layout público */}
         <Route path="/" element={<AuthLayout />}>
           <Route index element={<LoginPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="reset-password" element={<ResetPasswordPage />} />
+          <Route path="iniciar-sesion" element={<LoginPage />} />
+          <Route path="registrarse" element={<RegisterPage />} />
+          <Route path="olvide-contrasena" element={<ForgotPasswordPage />} />
+          <Route path="restablecer-contrasena" element={<ResetPasswordPage />} />
         </Route>
 
         {/* Layout privado con rutas protegidas */}
@@ -36,6 +41,14 @@ export default function AppRouter() {
             }
           />
           <Route
+            path="perfil/:userId"
+            element={
+              <ProtectedRoute roles={['Administrador', 'Supervisor', 'Manager', 'Colaborador']}>
+                <UserProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="colaboradores"
             element={
               <ProtectedRoute roles={['Administrador']}>
@@ -43,11 +56,11 @@ export default function AppRouter() {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="huellas"
             element={
               <ProtectedRoute roles={['Administrador', 'Manager']}>
-                <HomePage /> {/* Aquí podrías tener un layout específico para huellas */}
+                <BadgeLayout /> {/* ahora sí es un contenedor válido */}
               </ProtectedRoute>
             }
           >
@@ -55,7 +68,7 @@ export default function AppRouter() {
               path="asignar"
               element={
                 <ProtectedRoute roles={['Administrador', 'Manager']}>
-                     <HomePage />
+                  <HomePage />
                 </ProtectedRoute>
               }
             />
@@ -63,7 +76,7 @@ export default function AppRouter() {
               path="categorias"
               element={
                 <ProtectedRoute roles={['Administrador']}>
-                     <HomePage />
+                  <BadgeCategoriesPage />
                 </ProtectedRoute>
               }
             />
@@ -72,7 +85,7 @@ export default function AppRouter() {
             path="premios"
             element={
               <ProtectedRoute roles={['Administrador']}>
-                <HomePage />
+                <PrizesPage />
               </ProtectedRoute>
             }
           />
@@ -85,13 +98,21 @@ export default function AppRouter() {
             }
           />
           <Route
+            path="usuarios"
+            element={
+              <ProtectedRoute roles={['Administrador']}>
+                <UsersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="configuracion"
             element={
               <ProtectedRoute roles={['Administrador']}>
                 <SettingsPage />
               </ProtectedRoute>
             }
-          />
+          />  
           <Route
             path="equipo"
             element={

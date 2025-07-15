@@ -17,9 +17,9 @@ import {
 import type { EmployeeDto } from '../../types/Employee';
 import { EmployeeTableToolbar } from '../../components/main/employee/EmployeeTableToolbar';
 import { useEmployees } from '../../hooks/useEmployee';
-import FullPageLoader from '../../components/main/FullPageLoader';
+import FullPageLoader from '../../components/main/utils/FullPageLoader';
 import { Icon } from '@iconify/react/dist/iconify.js';
-import ErrorMessage from '../../components/main/ErrorMessage';
+import ErrorMessage from '../../components/main/utils/ErrorMessage';
 
 export default function TeamPage() {
   const { team, loading, error } = useEmployees();
@@ -227,17 +227,25 @@ const renderEmployeeRow = (
         overflow: isDesktop ? 'hidden' : 'visible',
       }}
     >
-      <Typography
-        variant="h3"
-        fontWeight="bold"
-        color="primary.dark"
-        textAlign="center"
-        px={2}
-        pt={1}
-        sx={{ width: '100%', fontSize: 'clamp(1.7rem, 4vw, 2rem)' }}
-      >
-        Equipo de Trabajo
-      </Typography>
+      <Box px={2} pt={1}>
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+          color="primary.dark"
+          textAlign="left"
+          sx={{ fontSize: 'clamp(1.7rem, 4vw, 2rem)' }}
+        >
+          Equipo de Trabajo
+        </Typography>
+
+        <Typography
+          variant="subtitle1"
+          color="text.secondary"
+          mt={0.5}
+        >
+          Visualiza y administra los colaboradores que forman parte de tu equipo.
+        </Typography>
+      </Box>
 
       <Card
         sx={{

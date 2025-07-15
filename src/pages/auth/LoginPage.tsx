@@ -59,7 +59,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   try {
     const result = await loginUser(form);
-    const {employeeNumber, fullName, email, roles } = result.userToken.user;
+    const {id, employeeNumber, fullName, email, roles, profilePicture, isManager } = result.userToken.user;
 
     if (!roles || roles.length === 0) {
       setError('El usuario no tiene roles asignados.');
@@ -67,11 +67,14 @@ const handleSubmit = async (e: React.FormEvent) => {
     }
 
     login(result.userToken.token, {
+      id: id,
       employeeNumber: employeeNumber,
       name: fullName,
       email,
       roles,
       activeRole: roles[0],  
+      profilePicture: profilePicture,
+      isManager: isManager
     });
 
     setSuccess(result.message);
@@ -263,7 +266,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         </Button>
 
         <Typography variant="body1" sx={{ textAlign: 'center', mt: 2 }}>
-          <Link  component={RouterLink} to="/forgot-password" underline="hover" sx={{ color: theme.palette.publicisTurquoise.main,  fontWeight: 500, fontSize: 14 }}>
+          <Link  component={RouterLink} to="/olvide-contrasena" underline="hover" sx={{ color: theme.palette.publicisTurquoise.main,  fontWeight: 500, fontSize: 14 }}>
             ¿Olvidaste tu contraseña?
           </Link>
         </Typography>
@@ -272,7 +275,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           ¿Primera vez?{' '}
           <Link
             component={RouterLink}
-            to="/register"
+            to="/registrarse"
             underline="hover"
             sx={{ color: theme.palette.publicisBlue.main, fontWeight: 500, fontSize: 18 }}
           >

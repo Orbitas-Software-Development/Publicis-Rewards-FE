@@ -16,6 +16,7 @@ import {
   type SelectChangeEvent,
 } from '@mui/material';
 import { Icon } from '@iconify/react';
+import theme from '../../../theme/theme';
 
 type StatusOption = 'all' | 'active' | 'inactive';
 
@@ -91,23 +92,29 @@ export function EmployeeTableToolbar({
             <Icon icon="eva:search-fill" width={20} />
           </InputAdornment>
         }
-        sx={{
-          width: 320,
-          height: 46,
-          fontSize: 14,
+       sx={{
+        width: 320,
+        height: 46,
+        fontSize: 14,
+        borderRadius: 1.5,
+        '& .MuiOutlinedInput-notchedOutline': {
           borderRadius: 1.5,
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderRadius: 1.5,
+        },
+        '& input': {
+          padding: '8px 12px',
+          fontSize: 16,
+          '&::placeholder': {
+            color: 'rgba(0, 0, 0, 0.54)',
+            opacity: 1,
           },
-          '& input': {
-            padding: '8px 12px',
-          },
-        }}
+        },
+      }}
+
       />
 
-      <Tooltip title="Filter list">
+      <Tooltip title="Filtros">
         <IconButton onClick={handleClick}>
-          <Icon icon="ic:round-filter-list" />
+          <Icon icon="ic:round-filter-list" fontSize={26} />
         </IconButton>
       </Tooltip>
 
@@ -162,7 +169,7 @@ export function EmployeeTableToolbar({
             <Button size="small" onClick={clearFilters}>
               Limpiar
             </Button>
-            <Button size="small" variant="contained" onClick={applyFilters}>
+            <Button size="small" variant="contained" onClick={applyFilters} sx={{color: theme.palette.publicisGrey.light}}>
               Aplicar
             </Button>
           </Box>

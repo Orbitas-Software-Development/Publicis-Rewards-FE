@@ -58,7 +58,7 @@ export default function RegisterPage() {
     try {
       const result = await registerUser(form);
       setSuccess(result.message);
-      setTimeout(() => navigate('/login'), 1500);
+      setTimeout(() => navigate('/iniciar-sesion'), 1500);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -219,7 +219,7 @@ export default function RegisterPage() {
           ¿Ya tienes cuenta?{' '}
         <Link
             component={RouterLink}
-            to="/login"
+            to="/iniciar-sesion"
             underline="hover"
             sx={{ color: theme.palette.publicisBlue.main, fontWeight: 500, fontSize: 18 }}
           >

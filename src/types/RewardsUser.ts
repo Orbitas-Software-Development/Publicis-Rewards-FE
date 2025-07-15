@@ -8,6 +8,7 @@ export interface RewardsUser {
   hireDate: string;
   status: string;
   createdAt: string;
-
   roles: RewardsRole[];
+  profilePicture: string | null;
+  isManager: boolean;
 }

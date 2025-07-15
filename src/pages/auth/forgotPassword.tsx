@@ -43,7 +43,6 @@ export default function ForgotPasswordPage() {
 
   try {
     const response = await sendPasswordResetLink(email);
-    console.log(response.message)
     setSuccess(response.message);
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -158,7 +157,7 @@ export default function ForgotPasswordPage() {
           <ArrowBackIosNewIcon fontSize="small" />
           <Link
             component={RouterLink}
-            to="/login"
+            to="/iniciar-sesion"
             underline="hover"
             sx={{ ml: 0.5,display: 'flex', alignItems: 'center' }}
           >

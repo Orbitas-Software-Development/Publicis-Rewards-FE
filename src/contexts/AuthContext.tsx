@@ -8,11 +8,14 @@ import {
 import type { RewardsRole } from '../types/RewardsRole';
 
 interface User {
+  id: number,
   employeeNumber: string,
   name: string;
   email: string;
   roles: RewardsRole[];
   activeRole: RewardsRole;
+  profilePicture: string | null;
+  isManager: boolean;
 }
 
 interface AuthContextType {
@@ -22,6 +25,8 @@ interface AuthContextType {
   login: (token: string, user: User) => void;
   logout: () => void;
   loading: boolean;
+  updateUserProfilePictureInAuth: (newPath: string) => void;
+  updateUserRoles: (roles: RewardsRole[]) => void; 
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -110,12 +115,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 };
 
-
-
   const logout = () => {
     clearAuth();
     broadcast?.postMessage({ type: 'logout' });
   };
+
+  const updateUserProfilePictureInAuth = (newPath: string) => {
+    setUser(prev => {
+      if (!prev) return prev;
+
+      const updatedUser = { ...prev, profilePicture: newPath };
+      localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+
+      broadcast?.postMessage({ type: 'login', token, user: updatedUser });
+
+      return updatedUser;
+    });
+  };
+
+    const updateUserRoles = (newRoles: RewardsRole[]) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+
+      const updatedUser: User = {
+        ...prev,
+        roles: newRoles,
+        activeRole: newRoles.find(r => r.name === prev.activeRole.name) ?? newRoles[0],
+      };
+
+      localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+      broadcast?.postMessage({ type: 'login', token, user: updatedUser });
+
+      return updatedUser;
+    });
+  };
+
+
 
   const clearAuth = () => {
     setToken(null);
@@ -127,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAuthenticated = useMemo(() => !!token && !!user, [token, user]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout, loading, updateUserProfilePictureInAuth,updateUserRoles }}>
       {children}
     </AuthContext.Provider>
   );

@@ -64,6 +64,25 @@ const getDashboardData = (role: string) => {
           { name: 'Mar', huellas: 90 },
         ],
       };
+    case 'manager':
+      return {
+        cards: [
+          { label: 'Miembros del equipo', value: 10, color: 'primary.main', path: '/equipo' },
+          { label: 'Huellas disponibles', value: 800, color: 'error.main', path: '/huellas' },
+          { label: 'Reconocimientos hechos', value: 15, color: 'secondary.main', path: '/historial' },
+          { label: 'Premios canjeados por equipo', value: 8, color: 'success.main', path: '/canjes' },
+        ],
+        pieData: [
+          { name: 'Carlos', value: 5 },
+          { name: 'Ana', value: 3 },
+          { name: 'Luis', value: 2 },
+        ],
+        barData: [
+          { name: 'Ene', huellas: 100 },
+          { name: 'Feb', huellas: 150 },
+          { name: 'Mar', huellas: 90 },
+        ],
+    };
     case 'colaborador':
       return {
         cards: [
@@ -100,7 +119,7 @@ export default function HomePage() {
     );
   }
 
-  const role = user.role?.name?.toLowerCase() || 'colaborador';
+  const role = user.activeRole.name?.toLowerCase() || 'colaborador';
   const { cards, pieData, barData } = getDashboardData(role);
 
   return (
