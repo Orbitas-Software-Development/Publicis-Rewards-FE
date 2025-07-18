@@ -101,10 +101,10 @@ export default function ForgotPasswordPage() {
             '& fieldset': {
               border: `2px solid`,
               borderImageSlice: 1,
-              borderImageSource: `linear-gradient(90deg, ${theme.palette.publicisTurquoise.main}, ${theme.palette.publicisPink.main})`,
+              borderImageSource: `linear-gradient(90deg, ${theme.palette.publicisTurquoise.main}, ${theme.palette.publicisOrange.main})`,
             },
             '&:hover fieldset': {
-              borderImageSource: `linear-gradient(90deg, ${theme.palette.publicisPink.light}, ${theme.palette.publicisTurquoise.light})`,
+              borderImageSource: `linear-gradient(90deg, ${theme.palette.publicisOrange.light}, ${theme.palette.publicisTurquoise.light})`,
             },
             '&.Mui-focused fieldset': {
               border: '2px solid',
@@ -134,11 +134,11 @@ export default function ForgotPasswordPage() {
         disabled={loading}
         sx={{
           py: 1.2,
-          backgroundImage: `linear-gradient(90deg, ${theme.palette.publicisTurquoise.main}, ${theme.palette.publicisPink.main})`,
+          backgroundImage: `linear-gradient(90deg, ${theme.palette.publicisTurquoise.main}, ${theme.palette.publicisOrange.main})`,
           color: theme.palette.publicisGrey.main,
           fontWeight: 600,
           '&:hover': {
-            backgroundImage: `linear-gradient(90deg, ${theme.palette.publicisPink.dark}, ${theme.palette.publicisTurquoise.dark})`,
+            backgroundImage: `linear-gradient(90deg, ${theme.palette.publicisOrange.dark}, ${theme.palette.publicisTurquoise.dark})`,
           },
         }}
       >

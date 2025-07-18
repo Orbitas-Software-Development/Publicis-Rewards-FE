@@ -128,12 +128,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const createUserByAdminFn = useCallback(
     async (dto: CreateUserByAdminDto): Promise<string> => {
-      const msg = await createUserByAdmin(dto);
-      await fetchData();
-      return msg;
+      const { data: newUser, message } = await createUserByAdmin(dto);
+      setUsers(prev => [...prev, newUser]); 
+      return message;
     },
-    [fetchData]
+    []
   );
+
 
 
   const value = useMemo(

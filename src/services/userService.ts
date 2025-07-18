@@ -83,10 +83,13 @@ export async function inviteUser(employeeNumber: string): Promise<string> {
 }
 
 
-export async function createUserByAdmin(dto: CreateUserByAdminDto): Promise<string> {
+export async function createUserByAdmin(dto: CreateUserByAdminDto): Promise<{ data: RewardsUser; message: string }> {
   try {
     const response = await axios.post(`${API_URL}/User/create-by-admin`, dto);
-    return response.data.message;
+     return {
+      data: response.data.data,
+      message: response.data.message,
+    };
   } catch (error) {
     handleUserError(error as AxiosError<ErrorResponse>);
     throw error;

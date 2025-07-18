@@ -192,7 +192,7 @@ const UserProfilePage: React.FC = () => {
               height: 108,
               borderRadius: '50%',
               background: (theme) =>
-                `conic-gradient(${theme.palette.publicisBlue.light}, ${theme.palette.publicisPink.light}, ${theme.palette.publicisBlue.light})`,
+                `conic-gradient(${theme.palette.publicisBlue.light}, ${theme.palette.publicisOrange.light}, ${theme.palette.publicisBlue.light})`,
               padding: '4px',
               display: 'flex',
               alignItems: 'center',

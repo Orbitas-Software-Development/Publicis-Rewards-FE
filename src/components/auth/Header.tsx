@@ -20,7 +20,7 @@ export default function Header() {
         justifyContent: 'space-between',
         px: 3,
         backdropFilter: 'blur(10px)',
-        backgroundColor: 'rgba(0,0,0,0.9)',
+        backgroundColor: theme.palette.publicisBlack.dark,
         color: theme.palette.publicisGrey.light,
         zIndex: 20,
         boxShadow: '0 2px 10px rgba(0,0,0,0.3)',

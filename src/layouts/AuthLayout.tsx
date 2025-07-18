@@ -5,7 +5,7 @@ import { TypeAnimation } from 'react-type-animation';
 import { Outlet } from 'react-router-dom';
 import { useMediaQuery } from '@mui/material';
 import Header from '../components/auth/Header';
-import background from '../assets/images/background2.jpg';
+import background from '../assets/images/background1.jpg';
 import huella from '../assets/images/huella6.png';
 
 const BackgroundContainer = styled('div')({
@@ -19,19 +19,6 @@ const BackgroundContainer = styled('div')({
   alignItems: 'center',
   padding: '2rem',
   overflow: 'hidden',
-
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)', 
-    backdropFilter: 'blur(2px)', 
-    zIndex: 1,
-  },
-
 
 });
 

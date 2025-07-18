@@ -22,6 +22,7 @@ type MainHeaderProps = {
 export default function MainHeader({ onMenuClick, sidebarOpen }: MainHeaderProps) {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
+  const disableGutters = useMediaQuery(theme.breakpoints.up('sm'));
 
   return (
     <AppBar
@@ -29,13 +30,14 @@ export default function MainHeader({ onMenuClick, sidebarOpen }: MainHeaderProps
       elevation={0}
       color="default"
       sx={{
+        px:{xs:0, lg:2},
         borderBottom: `1px solid ${theme.palette.divider}`,
         backgroundColor: theme.palette.background.paper,
         zIndex: theme.zIndex.drawer + 1,
          boxShadow: '1px 0 4px rgba(0,0,0,0.15)', 
       }}
     >
-      <Container maxWidth={false} disableGutters={!isDesktop}>
+      <Container maxWidth={false} disableGutters={disableGutters}>
         <Toolbar
           sx={{
             display: 'flex',

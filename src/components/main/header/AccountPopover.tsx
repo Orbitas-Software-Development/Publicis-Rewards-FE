@@ -45,7 +45,7 @@ export default function AccountPopover() {
           width: 40,
           height: 40,
           background: (theme) =>
-            `conic-gradient(${theme.palette.publicisBlue.light}, ${theme.palette.publicisPink.light}, ${theme.palette.publicisBlue.light})`,
+            `conic-gradient(${theme.palette.publicisBlue.light}, ${theme.palette.publicisOrange.light}, ${theme.palette.publicisBlue.light})`,
         }}
       >
         <Avatar src={`${baseUrl}${user?.profilePicture}`} alt={user?.name} sx={{ width: 1, height: 1 }} />

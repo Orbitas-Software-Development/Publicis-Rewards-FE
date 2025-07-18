@@ -19,8 +19,8 @@ const theme = createTheme({
       contrastText: '#000000',
     },
     publicisGold: {
-      main: '#9D833E',
-      light: '#c6a959',
+      main: '#BDAB78',
+      light: '#DCD1B5',
       dark: '#6d5c2c',
       contrastText: '#000000',
     },
@@ -30,39 +30,44 @@ const theme = createTheme({
       dark: '#007aa8',
       contrastText: '#ffffff',
     },
-    publicisPink: {
-      main: '#D93D7A',
+    publicisOrange: {
+      main: '#FC8B3C',
+      light: '#FFA178',
+      dark: '#B65B19',
+      contrastText: '#ffffff',
+    },
+    publicisPurple: {
+      main: '#B96EFF',
       light: '#ff71a7',
-      dark: '#a2004f',
+      dark: '#7030A0',
       contrastText: '#ffffff',
     },
     publicisTurquoise: {
-      main: '#00B0A3',
-      light: '#5fe3d6',
-      dark: '#008073',
+      main: '#0EBAC5',
+      light: '#0EE2DA',
+      dark: '#097E87',
       contrastText: '#000000',
     },
 
-    // Mapas estándar de MUI
     primary: {
       main: '#16ABE0', 
     },
     secondary: {
-      main: '#9D833E', // Publicis Gold
+      main: '#9D833E', 
     },
     error: {
       light: '#FF563028',
-      main: '#FF5630',
-      dark: '#B71D18',
+      main: '#CC0028',
+      dark: '#A30020',
       contrastText: '#FFFFFF',
     },
     warning: {
-      main: '#9D833E',       // Publicis Gold
-      light: '#FFE399',      // Tono claro amarillo-naranja para fondo (degradado suave)
-      dark: '#5C4A1F',       // Tono oscuro para texto
+      main: '#9D833E',    
+      light: '#FFE399',    
+      dark: '#5C4A1F',      
     },
     info: {
-      main: '#00B0A3', // Publicis Turquoise
+      main: '#0EBAC5', 
     },
     success: {
       light: '#22C55E28',
@@ -77,10 +82,8 @@ const theme = createTheme({
     },
   },
 typography: {
-  // Fuente general para todo
   fontFamily: ['Gotham Narrow', 'Arial', 'sans-serif'].join(','),
 
-  // Títulos principales con ITC New Baskerville Roman
   h1: {
     fontFamily: ['ITC New Baskerville Roman', 'Georgia', 'serif'].join(','),
     fontWeight: 400,
@@ -142,7 +145,8 @@ declare module '@mui/material/styles' {
     publicisGrey: Palette['primary'];
     publicisGold: Palette['primary'];
     publicisBlue: Palette['primary'];
-    publicisPink: Palette['primary'];
+    publicisOrange: Palette['primary'];
+     publicisPurple: Palette['primary'];
     publicisTurquoise: Palette['primary'];
   }
   interface PaletteOptions {
@@ -150,7 +154,8 @@ declare module '@mui/material/styles' {
     publicisGrey?: PaletteOptions['primary'];
     publicisGold?: PaletteOptions['primary'];
     publicisBlue?: PaletteOptions['primary'];
-    publicisPink?: PaletteOptions['primary'];
+    publicisOrange?: PaletteOptions['primary'];
+       publicisPurple: Palette['primary'];
     publicisTurquoise?: PaletteOptions['primary'];
   }
 }
