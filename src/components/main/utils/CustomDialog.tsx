@@ -38,7 +38,7 @@ const CustomDialog: React.FC<Props> = ({ open, onClose, title, children, actions
         },
          backdrop: {
             sx: {
-                backgroundColor: 'rgba(0, 0, 0, 0.3)', // menos oscuro
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
             },
         },
       }}

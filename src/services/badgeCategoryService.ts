@@ -6,6 +6,12 @@ interface ErrorResponse {
   message?: string;
 }
 
+interface BadgeCategoryStatusDto {
+  id: number;
+  isActive: boolean;
+}
+
+
 // Obtener todas las categorías
 export async function fetchAllBadgeCategories(): Promise<RewardsBadgeCategory[]> {
   try {
@@ -43,15 +49,26 @@ export async function createBadgeCategory(dto: Omit<RewardsBadgeCategory, 'id' |
 }
 
 
-// Actualizar una categoría
-export async function updateBadgeCategory(id: number, dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>): Promise<void> {
+export async function updateBadgeCategory(id: number, dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>): Promise<string> {
   try {
-    await axios.put(`${API_URL}/BadgeCategories/${id}`, dto);
+     const response = await axios.put(`${API_URL}/BadgeCategories/${id}`, dto);
+     return response.data.message;
   } catch (error) {
     handleBadgeCategoryError(error as AxiosError<ErrorResponse>);
     throw error;
   }
 }
+
+export async function changeBadgeCategoryStatus(dto: BadgeCategoryStatusDto): Promise<string> {
+  try {
+    const response = await axios.put(`${API_URL}/BadgeCategories/change-status`, dto);
+    return response.data.message; 
+  } catch (error) {
+    handleBadgeCategoryError(error as AxiosError<ErrorResponse>);
+    throw error;
+  }
+}
+
 
 // Eliminar una categoría
 export async function deleteBadgeCategory(id: number): Promise<void> {

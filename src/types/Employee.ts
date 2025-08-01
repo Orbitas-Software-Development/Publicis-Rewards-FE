@@ -4,5 +4,6 @@ export interface EmployeeDto {
   email: string;
   hireDate: string; 
   active: string;
+  availablePoints: number;
   team: EmployeeDto[];
 }

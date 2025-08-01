@@ -18,7 +18,7 @@ type Props = {
   onImageChange: (file: File | null) => void;
   onSave: () => Promise<void>;
   formData: FormData;
-  isEditing: boolean;
+  dialogMode: 'add' | 'edit';
 };
 
 const PrizeDialog: React.FC<Props> = ({
@@ -28,7 +28,8 @@ const PrizeDialog: React.FC<Props> = ({
   onImageChange,
   onSave,
   formData,
-  isEditing,
+  dialogMode
+
 }) => {
   const [errors, setErrors] = useState({
     code: false,
@@ -88,7 +89,7 @@ const PrizeDialog: React.FC<Props> = ({
     <CustomDialog
       open={open}
       onClose={onClose}
-      title={isEditing ? 'Editar Premio' : 'Añadir Premio'}
+      title={dialogMode === 'edit' ? 'Editar Premio' : 'Añadir Premio'}
       actions={
         <Box display="flex" justifyContent="flex-end" gap={1} width="100%">
           <Button onClick={onClose} disabled={loading}>
@@ -99,7 +100,7 @@ const PrizeDialog: React.FC<Props> = ({
             color="primary"
             onClick={validateAndSave}
             disabled={loading}
-            sx={{ width: {xs: '40%', sm:'30%', md:'25%', xl: '25%'}, color: theme.palette.publicisGrey.light }}
+            sx={{ width: { xs: '40%', sm: '30%', md: '20%' }, color: theme.palette.publicisGrey.light }}
           >
             {loading ? <CircularProgress size={24} color="inherit" /> : 'Guardar'}
           </Button>

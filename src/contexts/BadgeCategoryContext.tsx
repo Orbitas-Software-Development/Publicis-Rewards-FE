@@ -14,7 +14,9 @@ import {
   createBadgeCategory,
   updateBadgeCategory,
   deleteBadgeCategory,
+  changeBadgeCategoryStatus,
 } from '../services/badgeCategoryService';
+import { useAuth } from '../hooks/useAuth';
 
 interface BadgeCategoryContextType {
   categories: RewardsBadgeCategory[];
@@ -22,7 +24,8 @@ interface BadgeCategoryContextType {
   error: string | null;
   refresh: () => void;
   createCategory: (dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>) => Promise<string>;
-  updateCategory: (id: number, dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>) => Promise<void>;
+  updateCategory: (id: number, dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>) => Promise<string>;
+  changeCategoryStatus: (dto: { id: number; isActive: boolean }) => Promise<string>;
   deleteCategory: (id: number) => Promise<void>;
   getCategoryById: (id: number) => Promise<RewardsBadgeCategory>;
 }
@@ -34,7 +37,10 @@ export function BadgeCategoryProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { user } = useAuth();
+
   const fetchData = useCallback(async () => {
+    if (!user || user.activeRole?.id === 3) return;
     try {
       setLoading(true);
       const data = await fetchAllBadgeCategories();
@@ -45,11 +51,13 @@ export function BadgeCategoryProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (user?.activeRole?.id !== 3) {
+      fetchData();
+    }
+  }, [user, fetchData]);
 
   const createCategory = useCallback(
   async (dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>): Promise<string> => {
@@ -61,14 +69,27 @@ export function BadgeCategoryProvider({ children }: { children: ReactNode }) {
 );
 
   const updateCategory = useCallback(
-    async (id: number, dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>): Promise<void> => {
-      await updateBadgeCategory(id, dto);
+    async (id: number, dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>): Promise<string> => {
+     const message =  await updateBadgeCategory(id, dto);
       setCategories(prev =>
         prev.map(cat => (cat.id === id ? { ...cat, ...dto } : cat))
       );
+       return message;
     },
     []
   );
+
+  const changeCategoryStatus = useCallback(
+    async (dto: { id: number; isActive: boolean }): Promise<string> => {
+      const message = await changeBadgeCategoryStatus(dto);
+      setCategories(prev =>
+        prev.map(cat => (cat.id === dto.id ? { ...cat, isActive: dto.isActive } : cat))
+      );
+      return message;
+    },
+    []
+  );
+
 
   const deleteCategory = useCallback(
     async (id: number): Promise<void> => {
@@ -92,6 +113,7 @@ export function BadgeCategoryProvider({ children }: { children: ReactNode }) {
       updateCategory,
       deleteCategory,
       getCategoryById,
+      changeCategoryStatus,
     }),
     [
       categories,
@@ -102,6 +124,7 @@ export function BadgeCategoryProvider({ children }: { children: ReactNode }) {
       updateCategory,
       deleteCategory,
       getCategoryById,
+      changeCategoryStatus,
     ]
   );
 

@@ -16,6 +16,8 @@ import {
   fetchUserProfile,
   inviteUser,
   createUserByAdmin,
+  fetchManagerAvailablePoints,
+  fetchCollaboratorAvailablePoints,
 } from '../services/userService';
 import type { RewardsRole } from '../types/RewardsRole';
 import { useAuth } from '../hooks/useAuth';
@@ -34,6 +36,8 @@ interface UserContextType {
   getUserProfile: (userId: number) => Promise<UserProfile>; 
   inviteUserFn: (employeeNumber: string) => Promise<string>;
   createUserByAdminFn: (dto: CreateUserByAdminDto) => Promise<string>;
+  getManagerAvailablePoints: (userId: number) => Promise<number | null>;
+  getCollaboratorAvailablePoints: (userId: number) => Promise<number | null>;
 }
 
 const UserContext = createContext<UserContextType>({} as UserContextType);
@@ -43,6 +47,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user: authUser, updateUserProfilePictureInAuth } = useAuth();
+
 
   const fetchData = useCallback(async () => {
     try {
@@ -135,6 +140,22 @@ export function UserProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const getManagerAvailablePoints = useCallback(
+    async (userId: number): Promise<number | null> => {
+        const points = await fetchManagerAvailablePoints(userId);
+        return points;   
+    },
+    []
+  );
+
+  const getCollaboratorAvailablePoints = useCallback(
+    async (userId: number): Promise<number | null> => {
+        const points = await fetchCollaboratorAvailablePoints(userId);
+        return points;   
+    },
+    []
+  );
+
 
 
   const value = useMemo(
@@ -150,6 +171,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       getUserProfile, 
       inviteUserFn,
       createUserByAdminFn,
+      getManagerAvailablePoints,
+      getCollaboratorAvailablePoints,
     }),
     [
       users,
@@ -163,6 +186,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       getUserProfile,
       inviteUserFn,
       createUserByAdminFn, 
+      getManagerAvailablePoints,
+      getCollaboratorAvailablePoints,
     ]
   );
 

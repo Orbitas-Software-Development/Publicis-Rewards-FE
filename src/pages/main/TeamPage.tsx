@@ -32,7 +32,7 @@ export default function TeamPage() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeDto | null>(null);
-  const [sortBy, setSortBy] = useState<'employeeNumber' | 'fullName' | 'email' | 'hireDate'>('employeeNumber');
+  const [sortBy, setSortBy] = useState<'employeeNumber' | 'fullName' | 'email' | 'hireDate' | 'availablePoints'>('employeeNumber');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
@@ -66,11 +66,15 @@ export default function TeamPage() {
 
 
   const getSortedEmployees = (list: EmployeeDto[]) => {
-    return [...list].sort((a, b) => {
+      return [...list].sort((a, b) => {
       if (sortBy === 'hireDate') {
         const dateA = new Date(a.hireDate).getTime();
         const dateB = new Date(b.hireDate).getTime();
         return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      } else if (sortBy === 'availablePoints') {
+        return sortOrder === 'asc'
+          ? a.availablePoints - b.availablePoints
+          : b.availablePoints - a.availablePoints;
       } else {
         const valA = (a[sortBy] as string).toLowerCase();
         const valB = (b[sortBy] as string).toLowerCase();
@@ -181,6 +185,10 @@ const renderEmployeeRow = (
         <Typography fontSize={16}>
           {new Date(emp.hireDate).toLocaleDateString()}
         </Typography>
+      </TableCell>
+
+       <TableCell>
+        <Typography fontSize={16}>{emp.availablePoints}</Typography>
       </TableCell>
 
       <TableCell>
@@ -373,6 +381,17 @@ const renderEmployeeRow = (
                     </Typography>
                   </TableSortLabel>
                 </TableCell>
+                <TableCell sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
+                  <TableSortLabel
+                    active={sortBy === 'availablePoints'}
+                    direction={sortBy === 'availablePoints' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('availablePoints')}
+                   >
+                    <Typography variant="subtitle2" fontWeight={sortBy === 'availablePoints' ? 'bold' : '500'} fontSize={16}>
+                       Huellas Disponibles
+                    </Typography>
+                  </TableSortLabel>         
+                </TableCell>
 
                 <TableCell sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
                   <Typography variant="subtitle2" fontSize={16}>
@@ -385,7 +404,7 @@ const renderEmployeeRow = (
             <TableBody>
               {currentParents.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} sx={{ p: 0 }}>
+                  <TableCell colSpan={8} sx={{ p: 0 }}>
                     <Box
                       sx={{
                         minHeight: '300px',

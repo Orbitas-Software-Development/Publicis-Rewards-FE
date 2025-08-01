@@ -32,7 +32,7 @@ export default function EmployeesPage() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeDto | null>(null);
-  const [sortBy, setSortBy] = useState<'employeeNumber' | 'fullName' | 'email' | 'hireDate'>('employeeNumber');
+  const [sortBy, setSortBy] = useState<'employeeNumber' | 'fullName' | 'email' | 'hireDate' | 'availablePoints'>('employeeNumber');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const theme = useTheme();
@@ -64,21 +64,26 @@ export default function EmployeesPage() {
 
 
   const getSortedEmployees = (list: EmployeeDto[]) => {
-  return [...list].sort((a, b) => {
-    if (sortBy === 'hireDate') {
-      const dateA = new Date(a.hireDate).getTime();
-      const dateB = new Date(b.hireDate).getTime();
-      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-    } else {
-      const valA = (a[sortBy] as string).toLowerCase();
-      const valB = (b[sortBy] as string).toLowerCase();
+    return [...list].sort((a, b) => {
+      if (sortBy === 'hireDate') {
+        const dateA = new Date(a.hireDate).getTime();
+        const dateB = new Date(b.hireDate).getTime();
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      } else if (sortBy === 'availablePoints') {
+        return sortOrder === 'asc'
+          ? a.availablePoints - b.availablePoints
+          : b.availablePoints - a.availablePoints;
+      } else {
+        const valA = (a[sortBy] as string).toLowerCase();
+        const valB = (b[sortBy] as string).toLowerCase();
 
-      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    }
-  });
-};
+        if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+        if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      }
+    });
+  };
+
 
 
 const handleSort = (property: typeof sortBy) => {
@@ -144,26 +149,26 @@ const handleSort = (property: typeof sortBy) => {
 
       <TableCardContainer>
         <EmployeeTableToolbar
-        filterValue={filterText}
-        onFilterChange={(e) => {
-            setFilterText(e.target.value);
-            setPage(0);
-        }}
-        statusFilter={statusFilter}
-        onStatusFilterChange={(value) => {
-            setStatusFilter(value);
-            setPage(0);
-        }}
-        dateFrom={dateRangeFilter.from}
-        dateTo={dateRangeFilter.to}
-        onDateFromChange={(value) => {
-            setDateRangeFilter((prev) => ({ ...prev, from: value }));
-            setPage(0);
-        }}
-        onDateToChange={(value) => {
-            setDateRangeFilter((prev) => ({ ...prev, to: value }));
-            setPage(0);
-        }}
+          filterValue={filterText}
+          onFilterChange={(e) => {
+              setFilterText(e.target.value);
+              setPage(0);
+          }}
+          statusFilter={statusFilter}
+          onStatusFilterChange={(value) => {
+              setStatusFilter(value);
+              setPage(0);
+          }}
+          dateFrom={dateRangeFilter.from}
+          dateTo={dateRangeFilter.to}
+          onDateFromChange={(value) => {
+              setDateRangeFilter((prev) => ({ ...prev, from: value }));
+              setPage(0);
+          }}
+          onDateToChange={(value) => {
+              setDateRangeFilter((prev) => ({ ...prev, to: value }));
+              setPage(0);
+          }}
         />
 
         <TableContainer
@@ -226,6 +231,17 @@ const handleSort = (property: typeof sortBy) => {
                       </Typography>
                   </TableSortLabel>
                 </TableCell>
+                <TableCell sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
+                  <TableSortLabel
+                    active={sortBy === 'availablePoints'}
+                    direction={sortBy === 'availablePoints' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('availablePoints')}
+                   >
+                    <Typography variant="subtitle2" fontWeight={sortBy === 'availablePoints' ? 'bold' : '500'} fontSize={16}>
+                       Huellas Disponibles
+                    </Typography>
+                  </TableSortLabel>         
+                </TableCell>
 
                 <TableCell sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
                     <Typography variant="subtitle2" fontSize={16}>Estado</Typography>
@@ -236,7 +252,7 @@ const handleSort = (property: typeof sortBy) => {
             <TableBody>
                 {currentItems.length === 0 ? (
                 <TableRow>
-                    <TableCell colSpan={6} sx={{ p: 0 }}>
+                    <TableCell colSpan={7} sx={{ p: 0 }}>
                     <Box
                         sx={{
                         minHeight: '300px',
@@ -272,6 +288,7 @@ const handleSort = (property: typeof sortBy) => {
                         <TableCell><Typography variant='body1' fontSize={16}>{emp.fullName}</Typography></TableCell>
                         <TableCell><Typography variant='body1' fontSize={16}>{emp.email}</Typography></TableCell>
                         <TableCell><Typography variant='body1' fontSize={16}>{new Date(emp.hireDate).toLocaleDateString()}</Typography></TableCell>
+                        <TableCell><Typography variant='body1' fontSize={16}>{emp.availablePoints}</Typography></TableCell>
                         <TableCell>
                         <Box
                             sx={{

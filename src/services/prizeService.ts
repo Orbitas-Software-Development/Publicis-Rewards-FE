@@ -1,9 +1,15 @@
 import axios, { AxiosError } from 'axios';
 import { API_URL } from '../utils/ApiLinks';
 import type { RewardsPrize } from '../types/RewardsPrize';
+import type { RedeemPrizeDto } from '../types/ReddeemPrizeDto';
 
 interface ErrorResponse {
   message?: string;
+}
+
+interface PrizeStatusDto {
+  id: number;
+  isActive: boolean;
 }
 
 type CreatePrizeDto = Omit<RewardsPrize, 'id' | 'createdAt' | 'updatedAt' | 'imageUrl'> & {
@@ -97,6 +103,15 @@ export async function updatePrize(
   }
 }
 
+export async function changePrizeStatus(dto: PrizeStatusDto): Promise<string> {
+  try {
+    const response = await axios.put(`${API_URL}/Prize/change-status`, dto);
+    return response.data.message; 
+  } catch (error) {
+    handlePrizeError(error as AxiosError<ErrorResponse>);
+    throw error;
+  }
+}
 
 // Eliminar premio
 export async function deletePrize(id: number): Promise<void> {
@@ -108,24 +123,20 @@ export async function deletePrize(id: number): Promise<void> {
   }
 }
 
-export async function canRedeemPrize(prizeId: number, userPoints: number): Promise<boolean> {
+export async function redeemPrize(payload: RedeemPrizeDto): Promise<string> {
   try {
-    const response = await axios.get<boolean>(`${API_URL}/Prize/${prizeId}/canredeem/${userPoints}`);
-    return response.data;
+    const response = await axios.post(
+      `${API_URL}/Prize/redeem`,
+      payload
+    );
+
+    return response.data.message; 
   } catch (error) {
     handlePrizeError(error as AxiosError<ErrorResponse>);
     throw error;
   }
 }
 
-export async function redeemPrize(prizeId: number): Promise<void> {
-  try {
-    await axios.post(`${API_URL}/Prize/${prizeId}/redeem`);
-  } catch (error) {
-    handlePrizeError(error as AxiosError<ErrorResponse>);
-    throw error;
-  }
-}
 
 const handlePrizeError = (error: AxiosError): never => {
   if (error.response?.data) {

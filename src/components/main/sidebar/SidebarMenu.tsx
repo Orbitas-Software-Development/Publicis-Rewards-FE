@@ -14,13 +14,13 @@ import { IoIosPeople } from "react-icons/io";
 import { PiPawPrintFill } from "react-icons/pi";
 import { BiSolidCategory } from "react-icons/bi";
 import { HiTrophy } from "react-icons/hi2";
+import { GiCardExchange } from "react-icons/gi";
 import { GiTeamIdea } from "react-icons/gi";
 import { BiSolidReport } from "react-icons/bi";
 import { RiFileHistoryFill } from "react-icons/ri";
-import { MdOutlineMenuBook } from "react-icons/md";
+import { MdAssignment, MdOutlineMenuBook } from "react-icons/md";
 import { FaUsers } from "react-icons/fa6";
 import { RiSettings5Fill } from "react-icons/ri";
-
 import type { RoleKey, Page } from '../../../utils/menuConfig';
 import { menuConfig } from '../../../utils/menuConfig';
 
@@ -36,9 +36,10 @@ const iconMap: Record<string, React.ReactNode> = {
   equipo: <GiTeamIdea size={24} />,
   'mis-huellas': <PiPawPrintFill size={24}/>,
   huellas: <PiPawPrintFill size={24}/>,
-  asignar: <PiPawPrintFill size={22}/>,  
+  asignaciones: <MdAssignment size={22} />,  
   categorias: <BiSolidCategory size={22}/>, 
   premios: <HiTrophy size={24} />,
+  canjes: <GiCardExchange size={24} />,
   catalogo: <MdOutlineMenuBook size={24}/>,
   reportes: <BiSolidReport size={24}/>,
   configuracion: <RiSettings5Fill size={24}/>,

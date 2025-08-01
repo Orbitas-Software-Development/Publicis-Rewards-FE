@@ -14,9 +14,10 @@ import {
   createPrize,
   updatePrize,
   deletePrize,
-  canRedeemPrize,
   redeemPrize,
+  changePrizeStatus,
 } from '../services/prizeService';
+import type { RedeemPrizeDto } from '../types/ReddeemPrizeDto';
 
 interface PrizeContextType {
   prizes: RewardsPrize[];
@@ -25,10 +26,10 @@ interface PrizeContextType {
   refresh: () => void;
   create: (dto: Omit<RewardsPrize, 'createdAt' | 'updatedAt'> & { imageFile?: File | null }) => Promise<string>;
   update: (id: number, dto: Omit<RewardsPrize, 'createdAt' | 'updatedAt'> & { imageFile?: File | null }) => Promise<void>;
+  changeStatus: (dto: { id: number; isActive: boolean }) => Promise<string>;
   remove: (id: number) => Promise<void>;
   getById: (id: number) => Promise<RewardsPrize>;
-  canRedeem: (id: number, userPoints: number) => Promise<boolean>;
-  redeem: (id: number) => Promise<void>;
+  redeem: (dto: RedeemPrizeDto) => Promise<string>;
 }
 
 
@@ -87,7 +88,16 @@ export function PrizeProvider({ children }: { children: ReactNode }) {
     []
   );
 
-
+  const changeStatus = useCallback(
+      async (dto: { id: number; isActive: boolean }): Promise<string> => {
+        const message = await changePrizeStatus(dto);
+        setPrizes(prev =>
+          prev.map(prize => (prize.id === dto.id ? { ...prize, isActive: dto.isActive } : prize))
+        );
+        return message;
+      },
+      []
+  );
 
   const remove = useCallback(
     async (id: number): Promise<void> => {
@@ -101,14 +111,24 @@ export function PrizeProvider({ children }: { children: ReactNode }) {
     return await fetchPrizeById(id);
   }, []);
 
-  const canRedeem = useCallback(async (id: number, userPoints: number): Promise<boolean> => {
-    return await canRedeemPrize(id, userPoints);
+
+  const redeem = useCallback(async (dto: RedeemPrizeDto): Promise<string> => {
+    const message = await redeemPrize(dto);
+
+   setPrizes(prev =>
+    prev.map(prize =>
+      prize.id === dto.prizeId
+        ? {
+            ...prize,
+            stock: Math.max(prize.stock - 1, 0),
+            isActive: Math.max(prize.stock - 1, 0) > 0 
+          }
+        : prize
+    )
+  );
+    return message;
   }, []);
 
-  const redeem = useCallback(async (id: number): Promise<void> => {
-    await redeemPrize(id);
-    await fetchData();
-  }, [fetchData]);
 
   const value = useMemo(
     () => ({
@@ -118,12 +138,12 @@ export function PrizeProvider({ children }: { children: ReactNode }) {
       refresh: fetchData,
       create,
       update,
+      changeStatus,
       remove,
       getById,
-      canRedeem,
       redeem,
     }),
-    [prizes, loading, error, fetchData, create, update, remove, getById, canRedeem, redeem]
+    [prizes, loading, error, fetchData, create, update, changeStatus, remove, getById, redeem]
   );
 
   return (

@@ -18,8 +18,8 @@ import {
 import { usePrizes } from '../../hooks/usePrize';
 import ErrorMessage from '../../components/main/utils/ErrorMessage';
 import FullPageLoader from '../../components/main/utils/FullPageLoader';
-import { FaEdit } from "react-icons/fa";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { FaEdit, FaToggleOff, FaToggleOn } from "react-icons/fa";
+//import { RiDeleteBin6Line } from "react-icons/ri";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import TableCardContainer from '../../components/main/table/TableCardContainer';
 import Pagination from '../../components/main/table/Pagination';
@@ -28,21 +28,22 @@ import type { RewardsPrize } from '../../types/RewardsPrize';
 import { API_URL } from '../../utils/ApiLinks';
 import { PrizeTableToolbar } from '../../components/main/prize/PrizeTableToolbar';
 import PrizeDialog from '../../components/main/prize/PrizeDialog';
-import ConfirmDialog from '../../components/main/utils/ConfirmDialog';
+//import ConfirmDialog from '../../components/main/utils/ConfirmDialog';
 import AnimatedSnackbar from '../../components/main/utils/AnimatedSnackbar';
 
-type OrderByOption = 'code' | 'description' | 'cost' | 'stock';
+type OrderByOption = 'code' | 'description' | 'cost' | 'stock' | 'status';
 
 const PrizesPage = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
-  const { prizes, loading, error, create, update, remove} = usePrizes();
+  const { prizes, loading, error, create, update, changeStatus} = usePrizes();
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingPrize, setEditingPrize] = useState<RewardsPrize | null>(null);
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
   const [formData, setFormData] = useState<
     Omit<RewardsPrize, 'createdAt' | 'imageUrl'> & {
       imageFile?: File | null;
@@ -59,10 +60,11 @@ const PrizesPage = () => {
     imagePreview: '',
   });
 
-
+  /*
   const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
   const [confirmDeletePrize, setConfirmDeletePrize] = useState<RewardsPrize | null>(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  */
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -123,6 +125,10 @@ const filteredPrizes = useMemo(() => {
           aVal = new Date(a.createdAt!).getTime();
           bVal = new Date(b.createdAt!).getTime();
           break;
+        case 'status':
+          aVal = a.isActive ? 'Activo' : 'Inactivo';
+          bVal = b.isActive ? 'Activo' : 'Inactivo';
+          break;
         default:
           return 0;
       }
@@ -151,16 +157,17 @@ const filteredPrizes = useMemo(() => {
     setPage(0); 
   };
 
-  
+  /*
   const handleOpenDeleteConfirmDialog = (prize: RewardsPrize) => {
     setConfirmDeletePrize(prize);
     setConfirmDeleteDialogOpen(true);
   };
-
+ */
 
  const handleOpen = (prize?: RewardsPrize) => {
   if (prize) {
     setEditingPrize(prize);
+    setDialogMode('edit');
     setFormData({
       id: prize.id,
       code: prize.code,
@@ -173,6 +180,7 @@ const filteredPrizes = useMemo(() => {
     });
   } else {
     setEditingPrize(null);
+    setDialogMode('add');
     setFormData({
       id: 0,
       code: '',
@@ -239,6 +247,7 @@ const filteredPrizes = useMemo(() => {
     }
   };
 
+  /*
   const handleRemovePrize = async () => {
     if (!confirmDeletePrize) return;
 
@@ -255,6 +264,21 @@ const filteredPrizes = useMemo(() => {
     } finally {
       setLoadingDelete(false);
       setConfirmDeleteDialogOpen(false);
+    }
+  };
+  */
+
+  const handleToggleStatus = async (prize: RewardsPrize) => {
+    try {
+      const newStatus = !prize.isActive;
+      const message = await changeStatus({ id: prize.id, isActive: newStatus });
+      showSnackbar(message, 'success');
+  
+    } catch (error) {
+      showSnackbar(
+        error instanceof Error ? error.message : 'Error al cambiar el estado',
+        'error'
+      );
     }
   };
 
@@ -402,7 +426,15 @@ const filteredPrizes = useMemo(() => {
                 </TableCell>
 
                 <TableCell sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
-                    <Typography variant="subtitle2" fontSize={16}>Estado</Typography>
+                  <TableSortLabel
+                    active={sortBy === 'status'}
+                    direction={sortBy === 'status' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('status')}
+                    >
+                      <Typography variant="subtitle2" fontWeight={sortBy === 'status' ? 'bold' : '500'} fontSize={16}>
+                        Estado
+                      </Typography>
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell sx={{ backgroundColor: theme.palette.publicisGrey.main }}>
                   <Typography variant="subtitle2" fontWeight={'500'} fontSize={16}>
@@ -492,6 +524,29 @@ const filteredPrizes = useMemo(() => {
                             </IconButton>
                           </Tooltip>
 
+                          <Tooltip title={prize.isActive ? "Deshabilitar" : "Habilitar"}>
+                            <IconButton
+                              onClick={() => handleToggleStatus(prize)}
+                              sx={{
+                                bgcolor: 'common.white',
+                                border: '1.5px solid',
+                                borderColor: 'grey.400',
+                                borderRadius: 2,
+                                color: prize.isActive ? 'success.main' : 'error.main',
+                                '&:hover': {
+                                  bgcolor: prize.isActive ? 'success.light' : 'error.light',
+                                  color: prize.isActive ? 'success.dark' : 'error.dark',
+                                  borderColor: prize.isActive ? 'success.dark' : 'error.dark',
+                                },
+                                 transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
+                              }}
+                              >
+                              {/* Icono de encendido/apagado, puedes usar cualquier icono */}
+                              {prize.isActive ? <FaToggleOn size={20} /> : <FaToggleOff size={20} />}
+                            </IconButton>
+                          </Tooltip>
+
+                          {/*
                           <Tooltip title="Eliminar">
                             <IconButton
                               onClick={() => handleOpenDeleteConfirmDialog(prize)}
@@ -512,6 +567,7 @@ const filteredPrizes = useMemo(() => {
                               <RiDeleteBin6Line size={18} />
                             </IconButton>
                           </Tooltip>
+                          */}
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -541,8 +597,9 @@ const filteredPrizes = useMemo(() => {
         onImageChange={handleImageChange}
         onSave={handleSave}
         formData={formData}
-        isEditing={!!editingPrize}
+        dialogMode={dialogMode}
       />
+      {/*
       <ConfirmDialog
         open={confirmDeleteDialogOpen}
         title="Confirmar eliminación"
@@ -557,6 +614,7 @@ const filteredPrizes = useMemo(() => {
         cancelText="Cancelar"
         loading={loadingDelete}
       />
+      */}
       <AnimatedSnackbar
         open={snackbarOpen}
         message={snackbarMessage}

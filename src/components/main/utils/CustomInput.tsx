@@ -1,4 +1,3 @@
-// CustomInput.tsx
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import theme from '../../../theme/theme';
@@ -11,11 +10,12 @@ type Props = {
   error?: boolean;
   errorMessage?: string;
   type?: React.HTMLInputTypeAttribute;
+  readOnly?: boolean;
 };
 
 const baseInputStyle: React.CSSProperties = {
   width: '100%',
-  padding: '10px',
+  padding: '12px 10px',
   borderRadius: '6px',
   fontSize: '1rem',
   outline: 'none',
@@ -33,10 +33,13 @@ const CustomInput: React.FC<Props> = ({
   error = false,
   errorMessage,
   type = 'text',
+  readOnly = false,
 }) => {
   const style = {
     ...baseInputStyle,
     border: error ? `1.5px solid ${theme.palette.error.main}` : baseInputStyle.border,
+    backgroundColor: readOnly ? '#e0e0e0' : baseInputStyle.backgroundColor,
+    cursor: readOnly ? 'not-allowed' : 'text',
   };
 
   return (
@@ -44,7 +47,14 @@ const CustomInput: React.FC<Props> = ({
       <Typography variant="subtitle2" mb={0.5}>
         {label}
       </Typography>
-      <input name={name} value={value} onChange={onChange} style={style} type={type} />
+      <input
+        name={name}
+        value={value}
+        onChange={onChange}
+        style={style}
+        type={type}
+        readOnly={readOnly}
+      />
       {error && errorMessage && (
         <Typography color="error" sx={{ fontSize: '0.9rem', fontWeight: 500, mb: 1 }}>
           {errorMessage}

@@ -14,11 +14,12 @@ export const menuConfig: Record<RoleKey, Page[]> = {
       label: 'Huellas',
       path: '/huellas',
       children: [
-        { label: 'Asignar', path: '/huellas/asignar' },
+        { label: 'Asignaciones', path: '/huellas/asignaciones' },
         { label: 'Categorías', path: '/huellas/categorias' },
       ],
     },
     { label: 'Premios', path: '/premios' },
+    { label: 'Canjes', path: '/canjes' },
     { label: 'Reportes', path: '/reportes' },
     { label: 'Usuarios', path: '/usuarios' },
     { label: 'Configuración', path: '/configuracion' },
@@ -31,7 +32,7 @@ export const menuConfig: Record<RoleKey, Page[]> = {
   manager: [
     { label: 'Inicio', path: '/inicio' },
     { label: 'Mi Equipo', path: '/equipo' },
-    { label: 'Asignar Huellas', path: '/huellas' },
+    { label: 'Gestionar Huellas', path: '/huellas/asignaciones' },
     { label: 'Reportes', path: '/reportes' },
   ],
   colaborador: [

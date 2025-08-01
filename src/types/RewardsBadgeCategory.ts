@@ -5,4 +5,6 @@ export interface RewardsBadgeCategory {
   points: number;
   createdAt?: string;
   updatedAt?: string;
+  isActive: boolean;
+  isAutomatic: boolean;
 }

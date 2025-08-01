@@ -58,12 +58,10 @@ const UsersPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
 
-
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [inviteDrawerOpen, setInviteDrawerOpen] = useState(false);
   const [addUserDrawerOpen, setAddUserDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
 
   const [loadingDisable, setLoadingDisable] = useState(false);
 
@@ -442,7 +440,7 @@ const handleOpenDeleteConfirmDialog = () => {
             ) : (
                 currentItems.map((user) => (
                 <TableRow key={user.id}>
-                    <TableCell><Typography>{user.employeeNumber}</Typography></TableCell>
+                    <TableCell><Typography >{user.employeeNumber}</Typography></TableCell>
 
                     <TableCell>
                     <Box display="flex" alignItems="center" gap={2}>

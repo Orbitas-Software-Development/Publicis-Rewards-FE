@@ -16,6 +16,9 @@ import UserProfilePage from '../pages/main/UserProfilePage';
 import BadgeCategoriesPage from '../pages/main/BadgeCategoriesPage';
 import BadgeLayout from '../layouts/BadgeLayout';
 import PrizesPage from '../pages/main/PrizesPage';
+import BadgeManagementPage from '../pages/main/BadgeAssignmentPage';
+import CatalogPage from '../pages/main/CatalogPage';
+import RedemptionsHistoryPage from '../pages/main/RedemptionsHistoryPage';
 
 export default function AppRouter() {
   return (
@@ -65,10 +68,10 @@ export default function AppRouter() {
             }
           >
             <Route
-              path="asignar"
+              path="asignaciones"
               element={
                 <ProtectedRoute roles={['Administrador', 'Manager']}>
-                  <HomePage />
+                  <BadgeManagementPage />
                 </ProtectedRoute>
               }
             />
@@ -86,6 +89,14 @@ export default function AppRouter() {
             element={
               <ProtectedRoute roles={['Administrador']}>
                 <PrizesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="canjes"
+            element={
+              <ProtectedRoute roles={['Administrador']}>
+                 <RedemptionsHistoryPage />
               </ProtectedRoute>
             }
           />
@@ -133,7 +144,7 @@ export default function AppRouter() {
             path="catalogo"
             element={
               <ProtectedRoute roles={['Colaborador']}>
-                <HomePage />
+                <CatalogPage />
               </ProtectedRoute>
             }
           />
@@ -141,7 +152,7 @@ export default function AppRouter() {
             path="historial"
             element={
               <ProtectedRoute roles={['Colaborador']}>
-                <HomePage />
+                <RedemptionsHistoryPage />
               </ProtectedRoute>
             }
           />

@@ -105,73 +105,66 @@ export default function Sidebar({ mobileOpen, onDrawerToggle }: SidebarProps) {
           Publicis Rewards
         </Typography>
 
-        {/* Usuario */}
+      {/* Usuario */}
         <Box
           sx={{
             border: '1px solid',
             borderColor: isProfilePage ? 'primary.main' : 'divider',
             borderRadius: 2,
-            px: 1.5,
+            px: 1,
             mb: 2,
             bgcolor: isProfilePage ? 'action.selected' : 'transparent',
           }}
         >
-          <ListItem
-            disableGutters
-            sx={{
-              px: 0,
-              alignItems: 'flex-end',
-              display: 'flex',
-            }}
-          >
+          <ListItem disableGutters sx={{ px: 0, alignItems: 'center', display: 'flex' }}>
             <Avatar
               sx={{ width: 40, height: 40, mr: 1 }}
               src={`${baseUrl}${user?.profilePicture}`}
               alt={user?.name}
             />
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-end',
-                justifyContent: 'space-between',
-                flexGrow: 1,
-              }}
-            >
-              <Box>
-                <Typography variant="body1" fontWeight={600} fontSize={14}>
-                  {user?.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
+            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="body1" fontWeight={600} fontSize={14}>
+                {user?.name}
+              </Typography>
+
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="body2" color="text.secondary" fontWeight={500}>
                   {user?.activeRole.name}
                 </Typography>
+
+                <IconButton
+                  edge="end"
+                  size="small"
+                  onClick={handleMenuOpen}
+                >
+                  <MoreVertIcon />
+                </IconButton>
               </Box>
-              <IconButton
-                edge="end"
-                size="small"
-                sx={{ ml: 'auto', alignSelf: 'flex-end' }}
-                onClick={handleMenuOpen}
-              >
-                <MoreVertIcon />
-              </IconButton>
-               {/* Pop-up Menu */}
-              <Menu
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleMenuClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-              >
-                <MenuItem onClick={handleProfile}><Typography variant="subtitle1" >Ver perfil</Typography></MenuItem>
-                 {user && user.roles.length > 1 && (
-                    <MenuItem onClick={handleChangeRoleModal}>
-                      <Typography variant="subtitle1">Cambiar rol</Typography>
-                    </MenuItem>
-                 )}
-                <MenuItem onClick={handleLogout}><Typography variant="subtitle1" >Cerrar sesión</Typography></MenuItem>
-              </Menu>
             </Box>
+
+            {/* Pop-up Menu */}
+            <Menu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleMenuClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <MenuItem onClick={handleProfile}>
+                <Typography variant="subtitle1">Ver perfil</Typography>
+              </MenuItem>
+              {user && user.roles.length > 1 && (
+                <MenuItem onClick={handleChangeRoleModal}>
+                  <Typography variant="subtitle1">Cambiar rol</Typography>
+                </MenuItem>
+              )}
+              <MenuItem onClick={handleLogout}>
+                <Typography variant="subtitle1">Cerrar sesión</Typography>
+              </MenuItem>
+            </Menu>
           </ListItem>
         </Box>
+
 
         <Typography
           variant="subtitle2"

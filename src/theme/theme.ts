@@ -62,8 +62,8 @@ const theme = createTheme({
       contrastText: '#FFFFFF',
     },
     warning: {
-      main: '#9D833E',    
-      light: '#FFE399',    
+      main: '#FFD511',    
+      light: '#FFEE5C',    
       dark: '#5C4A1F',      
     },
     info: {
@@ -146,7 +146,7 @@ declare module '@mui/material/styles' {
     publicisGold: Palette['primary'];
     publicisBlue: Palette['primary'];
     publicisOrange: Palette['primary'];
-     publicisPurple: Palette['primary'];
+    publicisPurple: Palette['primary'];
     publicisTurquoise: Palette['primary'];
   }
   interface PaletteOptions {

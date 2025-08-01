@@ -96,6 +96,27 @@ export async function createUserByAdmin(dto: CreateUserByAdminDto): Promise<{ da
   }
 }
 
+export async function fetchManagerAvailablePoints(userId: number): Promise<number> {
+  try {
+    const response = await axios.get(`${API_URL}/User/${userId}/manager-available-points`);
+    return response.data.availablePoints;
+  } catch (error) {
+    handleUserError(error as AxiosError<ErrorResponse>);
+    throw error;
+  }
+}
+
+export async function fetchCollaboratorAvailablePoints(userId: number): Promise<number> {
+  try {
+    const response = await axios.get(`${API_URL}/User/${userId}/collaborator-available-points`);
+    return response.data.availablePoints;
+  } catch (error) {
+    handleUserError(error as AxiosError<ErrorResponse>);
+    throw error;
+  }
+}
+
+
 export async function deleteUser(userId: number): Promise<string> {
   try {
     const response = await axios.delete(`${API_URL}/User/${userId}`);
