@@ -30,6 +30,7 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onAssign: (data: { assignments: { userId: number; categoryId: number; points: number }[] }) => void;
+  assigning: boolean;
 };
 
 type DisplayUser = {
@@ -41,14 +42,14 @@ type DisplayUser = {
 
 type SelectedUser = DisplayUser & { categoryId: number | null };
 
-const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign }) => {
+const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign, assigning }) => {
   const [selectedUsers, setSelectedUsers] = useState<SelectedUser[]>([]);
   const [globalCategoryId, setGlobalCategoryId] = useState<number | null>(null); 
   const [availablePoints, setAvailablePoints] = useState<number>(0);
   const [loadingPoints, setLoadingPoints] = useState(false);
 
   const { user} = useAuth();
-  const { users, getManagerAvailablePoints, loading } = useUsers();
+  const { users, getManagerAvailablePoints} = useUsers();
   const { categories } = useBadgeCategories();
 
   const nonAutomaticCategories = categories.filter((cat) => !cat.isAutomatic);
@@ -86,7 +87,6 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
 
   if (assignments.length > 0) {
     onAssign({ assignments });
-    onClose();
   }
 };
 
@@ -157,7 +157,7 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
 
             {/* Contador */}
             <Box display="flex" alignItems="center" gap={2}>
-              <Avatar src={huella} alt="huellita" sx={{ width: 50, height: 50 }} />
+              <Avatar src={huella} alt="huellita" sx={{ width: {xs:40, md:50},  height: {xs:40, md:50} }} />
               <Box textAlign="left" sx={{mr:{xs:1, md: 4}}}>
                 <Typography variant="body2" color="text.secondary">
                   Huellas disponibles
@@ -355,10 +355,10 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
             variant="contained"
             color="primary"
             disabled={selectedUsers.length === 0 || hasError}
-            sx={{ color: theme.palette.publicisGrey.light }}
+            sx={{width: { xs: '40%', sm: '30%', md: '25%', lg: '20%' }, color: theme.palette.publicisGrey.light }}
             onClick={handleAssign}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Asignar Huellas'}
+            {assigning ? <CircularProgress size={24} color="inherit" /> : 'Asignar Huellas'}
           </Button>
         </DialogActions>
       </Box>

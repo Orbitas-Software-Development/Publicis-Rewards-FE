@@ -34,7 +34,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
   loading = false,
-  confirmColor = 'error', // <-- valor por defecto
+  confirmColor = 'error',
 }) => {
   return (
     <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>

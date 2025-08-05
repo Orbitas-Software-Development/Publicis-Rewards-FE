@@ -63,6 +63,9 @@ const BadgeAssignmentPage = () => {
   const [confirmDeleteAssignment, setConfirmDeleteAssignment] = useState<RewardsBadgeAssignment | null>(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
 
+  const [loadingManagerAssign, setLoadingManagerAssign] = useState(false);
+  const [loadingCollaboratorAssign, setLoadingCollaboratorAssign] = useState(false);
+
   const handleOpenDeleteConfirmDialog = (assignment: RewardsBadgeAssignment) => {
     setConfirmDeleteAssignment(assignment);
     setConfirmDeleteDialogOpen(true);
@@ -198,9 +201,9 @@ const currentItems = useMemo(() => {
       showSnackbar('Usuario no autenticado', 'error');
       return;
     }
+    setLoadingManagerAssign(true);
 
     const fromUserId = user.id;
-    const year = new Date().getFullYear();
 
     try {
       const toUserIds = data.assignments.map(assignment => {
@@ -211,7 +214,6 @@ const currentItems = useMemo(() => {
       const payload: CreateManagerGrantRequestDto = {
         fromUserId,
         toUserIds, 
-        year,
         pointsGranted: data.assignments[0]?.quantity || 0,
       };
 
@@ -224,6 +226,7 @@ const currentItems = useMemo(() => {
         'error'
       );
     }finally{
+      setLoadingManagerAssign(false);
       setOpenDialogType(null);
     }
   };
@@ -231,6 +234,8 @@ const currentItems = useMemo(() => {
   const handleAssignToCollaborators = async (data: {
     assignments: { userId: number; categoryId: number; points: number }[];
   }) => {
+
+    setLoadingCollaboratorAssign(true);
     try {
       const assignments = data.assignments.map(a => ({
         userId: a.userId,
@@ -252,6 +257,7 @@ const currentItems = useMemo(() => {
         'error'
       );
     }finally{
+        setLoadingCollaboratorAssign(false);
         setOpenDialogType(null);
     }
 };
@@ -545,6 +551,7 @@ const currentItems = useMemo(() => {
             open
             onClose={() => setOpenDialogType(null)}
             onAssign={handleAssignToManagers}
+            assigning = {loadingManagerAssign}
           />
         )}
 
@@ -553,6 +560,7 @@ const currentItems = useMemo(() => {
             open
             onClose={() => setOpenDialogType(null)}
             onAssign={handleAssignToCollaborators}
+            assigning = {loadingCollaboratorAssign}
           />
         )}
 

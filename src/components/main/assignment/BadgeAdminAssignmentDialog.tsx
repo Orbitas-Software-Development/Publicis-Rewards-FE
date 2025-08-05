@@ -22,6 +22,7 @@ type Props = {
   onAssign: (data: {
     assignments: { userId: number; quantity: number }[];
   }) => void;
+  assigning: boolean;
 };
 
 type DisplayUser = {
@@ -31,7 +32,7 @@ type DisplayUser = {
   role: string;
 };
 
-const BadgeAdminAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign }) => {
+const BadgeAdminAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign, assigning }) => {
   const [selectedUsers, setSelectedUsers] = useState<DisplayUser[]>([]);
   const [quantity, setQuantity] = useState('');
   const { users, loading, error } = useUsers();
@@ -53,7 +54,7 @@ const BadgeAdminAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign }
     }));
 
     onAssign({ assignments });
-    onClose();
+
   };
 
   const handleRemoveUser = (id: number) => {
@@ -67,19 +68,19 @@ const BadgeAdminAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign }
       title={'Asignar Huellas'}
       actions={
         <Box display="flex" justifyContent="flex-end" gap={1} width="100%">
-          <Button onClick={onClose} disabled={loading}>
+          <Button onClick={onClose} disabled={assigning}>
             Cancelar
           </Button>
           <Button
             variant="contained"
             color="primary"
             onClick={handleAssign}
-            sx={{color:theme.palette.publicisGrey.light}}
+            sx={{width: { xs: '50%', sm: '30%', md: '40%', lg: '30%' }, color:theme.palette.publicisGrey.light}}
             disabled={
               selectedUsers.length === 0 || !quantity || parseInt(quantity || '0', 10) <= 0
           }
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Asignar Huellas'}
+            {assigning ? <CircularProgress size={24} color="inherit" /> : 'Asignar Huellas'}
           </Button>
         </Box>
       }
