@@ -1,3 +1,5 @@
+import type { RewardsBadgeSubcategory } from "./RewardsBadgeSubcategory";
+
 export interface RewardsBadgeCategory {
   id: number;
   code: string;
@@ -7,4 +9,5 @@ export interface RewardsBadgeCategory {
   updatedAt?: string;
   isActive: boolean;
   isAutomatic: boolean;
+  subcategories: RewardsBadgeSubcategory[];
 }

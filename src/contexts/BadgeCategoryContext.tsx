@@ -15,8 +15,10 @@ import {
   updateBadgeCategory,
   deleteBadgeCategory,
   changeBadgeCategoryStatus,
+  updateBadgeSubcategory,
 } from '../services/badgeCategoryService';
 import { useAuth } from '../hooks/useAuth';
+import type { RewardsBadgeSubcategory } from '../types/RewardsBadgeSubcategory';
 
 interface BadgeCategoryContextType {
   categories: RewardsBadgeCategory[];
@@ -25,6 +27,7 @@ interface BadgeCategoryContextType {
   refresh: () => void;
   createCategory: (dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>) => Promise<string>;
   updateCategory: (id: number, dto: Omit<RewardsBadgeCategory, 'id' | 'createdAt'>) => Promise<string>;
+  updateSubcategory: (categoryId: number, dto: Omit<RewardsBadgeSubcategory, 'minYears' | 'maxYears' >) => Promise<string>;
   changeCategoryStatus: (dto: { id: number; isActive: boolean }) => Promise<string>;
   deleteCategory: (id: number) => Promise<void>;
   getCategoryById: (id: number) => Promise<RewardsBadgeCategory>;
@@ -79,6 +82,29 @@ export function BadgeCategoryProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const updateSubcategory = useCallback(
+    async (categoryId: number, dto: Omit<RewardsBadgeSubcategory, 'minYears' | 'maxYears'> & { id: number }): Promise<string> => {
+      const message = await updateBadgeSubcategory(categoryId, dto);
+
+      setCategories(prev =>
+        prev.map(cat => {
+          if (cat.id !== categoryId) return cat;
+
+          return {
+            ...cat,
+            subcategories: cat.subcategories?.map(sub =>
+              sub.id === dto.id ? { ...sub, ...dto } : sub
+            ),
+          };
+        })
+      );
+
+      return message;
+    },
+    []
+  );
+
+
   const changeCategoryStatus = useCallback(
     async (dto: { id: number; isActive: boolean }): Promise<string> => {
       const message = await changeBadgeCategoryStatus(dto);
@@ -111,6 +137,7 @@ export function BadgeCategoryProvider({ children }: { children: ReactNode }) {
       refresh: fetchData,
       createCategory,
       updateCategory,
+      updateSubcategory,
       deleteCategory,
       getCategoryById,
       changeCategoryStatus,
@@ -122,6 +149,7 @@ export function BadgeCategoryProvider({ children }: { children: ReactNode }) {
       fetchData,
       createCategory,
       updateCategory,
+      updateSubcategory,
       deleteCategory,
       getCategoryById,
       changeCategoryStatus,

@@ -6,5 +6,6 @@ export interface RewardsBadgeAssignment {
   quantity: number;
   assignedBy: string;
   assignedAt: string;
+  comment: string;
 }
 

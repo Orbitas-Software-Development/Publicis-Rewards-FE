@@ -30,6 +30,11 @@ import AnimatedSnackbar from '../../components/main/utils/AnimatedSnackbar';
 //import ConfirmDialog from '../../components/main/utils/ConfirmDialog';
 //import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FaEdit, FaToggleOff, FaToggleOn } from 'react-icons/fa';
+import { MdEditSquare } from "react-icons/md";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import type { RewardsBadgeSubcategory } from '../../types/RewardsBadgeSubcategory';
+import BadgeSubcategoryDialog from '../../components/main/category/BadgeSubcategoryDialog';
 
 
 type OrderByOption = 'code' | 'description' | 'points' | 'automatic';
@@ -37,8 +42,10 @@ type OrderByOption = 'code' | 'description' | 'points' | 'automatic';
 const BadgeCategoriesPage: React.FC = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
-  const { categories, loading, error, createCategory, updateCategory, changeCategoryStatus } = useBadgeCategories(); 
-  const [openDialog, setOpenDialog] = useState(false);
+
+  const {categories, loading, error, createCategory, updateCategory, updateSubcategory, changeCategoryStatus } = useBadgeCategories(); 
+
+  const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
   const [editingCategory, setEditingCategory] = useState<RewardsBadgeCategory | null>(null);
   const [formData, setFormData] = useState<Omit<RewardsBadgeCategory, 'id' | 'createdAt'>>({
@@ -46,7 +53,17 @@ const BadgeCategoriesPage: React.FC = () => {
     description: '',
     points: 0,
     isActive: true,
-    isAutomatic: false
+    isAutomatic: false,
+    subcategories: [],
+  });
+
+  const [openSubcategoryDialog, setOpenSubcategoryDialog] = useState(false);
+  const [editingSubcategory, setEditingSubcategory] = useState<RewardsBadgeSubcategory | null>(null);
+  const [editingCategoryId, setEditingcategoryId] = useState<number | null>(null);
+  const [formData2, setFormData2] = useState<Omit<RewardsBadgeSubcategory, 'minYears' | 'maxYears' >>({
+    id: 0,
+    description: '',
+    points: 0,
   });
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -68,6 +85,12 @@ const BadgeCategoriesPage: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
+
+  const [expandedCategoryId, setExpandedCategoryId] = useState<number | null>(null);
+
+  const toggleExpand = (id: number) => {
+    setExpandedCategoryId(prev => (prev === id ? null : id));
+  };
 
   const showSnackbar = (message: string, severity: 'success' | 'error') => {
     setSnackbarMessage(message);
@@ -100,8 +123,7 @@ const BadgeCategoriesPage: React.FC = () => {
     }
   };
 
-
-  const handleOpen = (category?: RewardsBadgeCategory) => {
+  const handleOpenCategoryDialog = (category?: RewardsBadgeCategory) => {
     if (category) {
       setDialogMode('edit');
       setEditingCategory(category);
@@ -110,21 +132,22 @@ const BadgeCategoriesPage: React.FC = () => {
         description: category.description,
         points: category.points,
         isActive: category.isActive,
-        isAutomatic: category.isAutomatic
+        isAutomatic: category.isAutomatic,
+        subcategories: category.subcategories || [], 
       });
     } else {
       setDialogMode('add');
       setEditingCategory(null);
-      setFormData({ code: '', description: '', points: 0, isActive: true, isAutomatic: false });
+      setFormData({ code: '', description: '', points: 0, isActive: true, isAutomatic: false, subcategories: [], });
     }
-    setOpenDialog(true);
+    setOpenCategoryDialog(true);
   };
 
 
-  const handleClose = () => {
-    setOpenDialog(false);
+  const handleCloseCategoryDialog = () => {
+    setOpenCategoryDialog(false);
     setEditingCategory(null);
-    setFormData({ code: '', description: '', points: 0, isActive: true, isAutomatic: false });
+    setFormData({ code: '', description: '', points: 0, isActive: true, isAutomatic: false, subcategories: [], });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,7 +158,7 @@ const BadgeCategoriesPage: React.FC = () => {
     }));
   };
 
-  const handleSave = async () => {
+  const handleSaveCategory = async () => {
     if (!formData.code || !formData.description || formData.points <= 0) {
       return;
     }
@@ -149,10 +172,61 @@ const BadgeCategoriesPage: React.FC = () => {
         showSnackbar(message, 'success');
       }
 
-      handleClose();
+      handleCloseCategoryDialog();
     } catch (err) {
       const errorMessage =
         (err as Error)?.message || 'Ocurrió un error al guardar la categoría.';
+      showSnackbar(errorMessage, 'error');
+    }
+  };
+
+   const handleOpenSubcategoryDialog = (categoryId: number, subcategory?: RewardsBadgeSubcategory) => {
+    if (subcategory) {
+      setEditingSubcategory(subcategory);
+      setEditingcategoryId(categoryId);
+      setFormData2({
+        id: subcategory.id,
+        description: subcategory.description,
+        points: subcategory.points,
+      });
+    } else {
+      setEditingSubcategory(null);
+      setEditingcategoryId(null);
+      setFormData2({ id:0, description: '', points: 0 });
+    }
+    setOpenSubcategoryDialog(true);
+  };
+
+
+  const handleCloseSubcategoryDialog = () => {
+    setOpenSubcategoryDialog(false);
+    setEditingSubcategory(null);
+    setEditingcategoryId(null);
+    setFormData2({ id:0, description: '', points: 0 });
+  };
+
+  const handleChangeSubcategory = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData2(prev => ({
+      ...prev,
+      [name]: name === 'points' ? Number(value) : value,
+    }));
+  };
+
+  const handleSaveSubcategory = async () => {
+    if (!formData2.id || !formData2.description || formData2.points <= 0) {
+      return;
+    }
+
+    try {
+      if (editingSubcategory) {
+        const message = await updateSubcategory(editingCategoryId!, formData2);
+        showSnackbar(message, 'success');  
+        handleCloseSubcategoryDialog();
+      }
+    } catch (err) {
+      const errorMessage =
+        (err as Error)?.message || 'Ocurrió un error al actualizar la subcategoría.';
       showSnackbar(errorMessage, 'error');
     }
   };
@@ -293,7 +367,7 @@ const BadgeCategoriesPage: React.FC = () => {
             color="primary"
             startIcon={<AddCircleIcon />}
             sx={{ textTransform: 'none', color: theme.palette.publicisGrey.light,  py:{md:1} }}
-            onClick={() => handleOpen()}
+            onClick={() => handleOpenCategoryDialog()}
           >
             Añadir Categoría
           </Button>
@@ -400,127 +474,232 @@ const BadgeCategoriesPage: React.FC = () => {
             </TableHead>
             <TableBody>
               {currentItems.map(cat => (
-                <TableRow key={cat.id}>
-                  <TableCell>
-                    <Typography variant="body1" fontSize={16}>
-                      {cat.code}
-                    </Typography>             
-                 </TableCell>
-                  <TableCell>
-                    <Typography variant="body1" fontSize={16}>
-                      {cat.description}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1" fontSize={16}>
-                      {cat.points}
-                    </Typography>          
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1" fontSize={16}>
-                      {new Date(cat.createdAt!).toLocaleDateString()}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    {cat.isAutomatic ? (
-                      <CheckIcon color="success" fontSize="small" />
-                    ) : (
-                      <CloseIcon color="error" fontSize="small" />
-                    )}
-                  </TableCell>
-                   <TableCell>
-                     <Box
-                        sx={{
-                        display: 'inline-block',
-                        px: 1,
-                        py: 0.5,
-                        borderRadius: '8px',
-                        fontWeight: 700,
-                        fontSize: 14,
-                        backgroundColor: cat.isActive
-                          ? theme.palette.success.light
-                          : theme.palette.error.light,
-                        color: cat.isActive
-                          ? theme.palette.success.dark
-                          : theme.palette.error.dark,
-                        textAlign: 'center',
-                        }}
+                <React.Fragment key={cat.id}>
+                  <TableRow 
+                    hover
+                    onClick={() => toggleExpand(cat.id)}
+                    sx={{ cursor: cat.subcategories?.length ? 'pointer' : 'default' }}
+                  >
+                    <TableCell sx={{ position: 'relative' }}>
+                      <Typography
+                        variant="body1"
+                        fontSize={16}
+                        component="div"
                       >
-                        {cat.isActive ? 'Activa' : 'Inactiva'}
+                        {cat.code}
+                      </Typography>
+                      {cat.subcategories?.length ? (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            bottom: -5,
+                            left: '30%',
+                            transform: 'translateX(-50%)',
+                          }}
+                        >
+                          {expandedCategoryId === cat.id ? (
+                            <KeyboardArrowUpIcon fontSize="small" />
+                          ) : (
+                            <KeyboardArrowDownIcon fontSize="small" />
+                          )}
+                        </Box>
+                      ) : null}
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography variant="body1" fontSize={16}>
+                        {cat.description}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body1" fontSize={16}>
+                        {cat.points}
+                      </Typography>          
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body1" fontSize={16}>
+                        {new Date(cat.createdAt!).toLocaleDateString()}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {cat.isAutomatic ? (
+                        <CheckIcon color="success" fontSize="small" />
+                      ) : (
+                        <CloseIcon color="error" fontSize="small" />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                          sx={{
+                          display: 'inline-block',
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: '8px',
+                          fontWeight: 700,
+                          fontSize: 14,
+                          backgroundColor: cat.isActive
+                            ? theme.palette.success.light
+                            : theme.palette.error.light,
+                          color: cat.isActive
+                            ? theme.palette.success.dark
+                            : theme.palette.error.dark,
+                          textAlign: 'center',
+                          }}
+                        >
+                          {cat.isActive ? 'Activa' : 'Inactiva'}
+                        </Box>
+                    </TableCell>               
+                    <TableCell>
+                      <Box display="flex" gap={1}>
+                        <Tooltip title="Editar">
+                          <IconButton
+                            onClick={() => handleOpenCategoryDialog(cat)}
+                            sx={{
+                              bgcolor: 'common.white',
+                              border: '1.5px solid',
+                              borderColor: 'grey.400',
+                              borderRadius: 2,
+                              color: 'primary.main',
+                              '&:hover': {
+                                bgcolor: 'action.selected',
+                                color: 'primary.dark',
+                                borderColor: 'primary.main',
+                              },
+                              transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
+                            }}
+                          >
+                            <FaEdit size={18} />
+                          </IconButton>
+                        </Tooltip>
+
+                        {/*
+                        <Tooltip title="Eliminar">
+                          <IconButton
+                            onClick={() => handleOpenDeleteConfirmDialog(cat)}
+                            sx={{
+                              bgcolor: 'common.white',
+                              border: '1.5px solid',
+                              borderColor: 'grey.400',
+                              borderRadius: 2,
+                              color: 'error.main',
+                              '&:hover': {
+                                bgcolor: 'error.light',
+                                color: 'error.dark',
+                                borderColor: 'error.main',
+                              },
+                              transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
+                            }}
+                          >
+                            <RiDeleteBin6Line size={18} />
+                          </IconButton>
+                        </Tooltip>
+                        */}
+
+                        <Tooltip title={cat.isActive ? "Deshabilitar" : "Habilitar"}>
+                          <IconButton
+                            onClick={() => handleToggleStatus(cat)}
+                            sx={{
+                              bgcolor: 'common.white',
+                              border: '1.5px solid',
+                              borderColor: 'grey.400',
+                              borderRadius: 2,
+                              color: cat.isActive ? 'success.main' : 'error.main',
+                              '&:hover': {
+                                bgcolor: cat.isActive ? 'success.light' : 'error.light',
+                                color: cat.isActive ? 'success.dark' : 'error.dark',
+                                borderColor: cat.isActive ? 'success.dark' : 'error.dark',
+                              },
+                              transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
+                            }}
+                          >
+                            {/* Icono de encendido/apagado, puedes usar cualquier icono */}
+                            {cat.isActive ? <FaToggleOn size={20} /> : <FaToggleOff size={20} />}
+                          </IconButton>
+                        </Tooltip>
                       </Box>
-                  </TableCell>               
-                  <TableCell>
-                    <Box display="flex" gap={1}>
-                      <Tooltip title="Editar">
-                        <IconButton
-                          onClick={() => handleOpen(cat)}
-                          sx={{
-                            bgcolor: 'common.white',
-                            border: '1.5px solid',
-                            borderColor: 'grey.400',
-                            borderRadius: 2,
-                            color: 'primary.main',
-                            '&:hover': {
-                              bgcolor: 'action.selected',
-                              color: 'primary.dark',
-                              borderColor: 'primary.main',
-                            },
-                            transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
-                          }}
-                        >
-                          <FaEdit size={18} />
-                        </IconButton>
-                      </Tooltip>
 
-                      {/*
-                      <Tooltip title="Eliminar">
-                        <IconButton
-                          onClick={() => handleOpenDeleteConfirmDialog(cat)}
-                          sx={{
-                            bgcolor: 'common.white',
-                            border: '1.5px solid',
-                            borderColor: 'grey.400',
-                            borderRadius: 2,
-                            color: 'error.main',
-                            '&:hover': {
-                              bgcolor: 'error.light',
-                              color: 'error.dark',
-                              borderColor: 'error.main',
-                            },
-                            transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
-                          }}
-                        >
-                          <RiDeleteBin6Line size={18} />
-                        </IconButton>
-                      </Tooltip>
-                      */}
-
-                      <Tooltip title={cat.isActive ? "Deshabilitar" : "Habilitar"}>
-                        <IconButton
-                          onClick={() => handleToggleStatus(cat)}
-                          sx={{
-                            bgcolor: 'common.white',
-                            border: '1.5px solid',
-                            borderColor: 'grey.400',
-                            borderRadius: 2,
-                            color: cat.isActive ? 'success.main' : 'error.main',
-                            '&:hover': {
-                              bgcolor: cat.isActive ? 'success.light' : 'error.light',
-                              color: cat.isActive ? 'success.dark' : 'error.dark',
-                              borderColor: cat.isActive ? 'success.dark' : 'error.dark',
-                            },
-                            transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
-                          }}
-                        >
-                          {/* Icono de encendido/apagado, puedes usar cualquier icono */}
-                          {cat.isActive ? <FaToggleOn size={20} /> : <FaToggleOff size={20} />}
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-
-                  </TableCell>
-                </TableRow>
+                    </TableCell>
+                  </TableRow>
+                    {/* Fila expandida con subcategorías */}
+                  {expandedCategoryId === cat.id && cat.subcategories?.length > 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} sx={{ bgcolor: theme.palette.grey[100], p: 0 }}>
+                        <Table size="small" aria-label="subcategories" sx={{ m: 0 }}>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>
+                                <Typography fontSize={14} fontWeight={500}>ID Subcategoría</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography fontSize={14} fontWeight={500}>Descripción</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography fontSize={14} fontWeight={500}>Años Mínimos</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography fontSize={14} fontWeight={500}>Años Máximos</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography fontSize={14} fontWeight={500}>Huellas</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography fontSize={14} fontWeight={500}>Acciones</Typography>
+                              </TableCell>
+                              {/* Puedes agregar más columnas si quieres */}
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {cat.subcategories.map(sub => (
+                              <TableRow key={sub.id} hover>
+                                <TableCell>
+                                <Typography fontSize={14}>{sub.id}</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography fontSize={14}>{sub.description || '-'}</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography fontSize={14}>{sub.minYears}</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography fontSize={14}>{sub.maxYears}</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography fontSize={14}>{sub.points}</Typography>
+                              </TableCell>
+                                 <TableCell>
+                                  <Box display="flex" gap={1}>
+                                    <Tooltip title="Editar número de huellas">
+                                      <IconButton
+                                        onClick={() => handleOpenSubcategoryDialog(cat.id, sub)}
+                                        sx={{                               
+                                      
+                                          borderColor: 'grey.500',
+                                          borderRadius: 50,
+                                          color: 'primary.main',
+                                          '&:hover': {
+                                            bgcolor: 'action.selected',
+                                            color: 'primary.dark',
+                                            borderColor: 'primary.main',
+                                          },
+                                          transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
+                                        }}
+                                      >
+                                        <MdEditSquare size={16} />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
+                                </TableCell>
+                                   
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))}
+
               {filteredCategories.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} align="center">
@@ -546,12 +725,19 @@ const BadgeCategoriesPage: React.FC = () => {
       </TableCardContainer>
 
       <BadgeCategoryDialog
-        open={openDialog}
-        onClose={handleClose}
+        open={openCategoryDialog}
+        onClose={handleCloseCategoryDialog}
         onChange={handleChange}
-        onSave={handleSave}
+        onSave={handleSaveCategory}
         formData={formData}
         dialogMode={dialogMode}
+      />
+      <BadgeSubcategoryDialog
+        open={openSubcategoryDialog}
+        onClose={handleCloseSubcategoryDialog}
+        onChange={handleChangeSubcategory}
+        onSave={handleSaveSubcategory}
+        formData={formData2}
       />
        {/*
       <ConfirmDialog

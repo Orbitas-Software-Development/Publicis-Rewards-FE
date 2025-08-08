@@ -15,7 +15,7 @@ import {
   Tooltip,
   IconButton,
 } from '@mui/material';
-import { MdAssignmentAdd} from 'react-icons/md';
+import { MdAssignmentAdd, MdOutlineVisibility} from 'react-icons/md';
 import TableCardContainer from '../../components/main/table/TableCardContainer';
 import { useBadgeAssignments } from '../../hooks/useBadgeAssignment';
 import FullPageLoader from '../../components/main/utils/FullPageLoader';
@@ -33,6 +33,7 @@ import { useAuth } from '../../hooks/useAuth';
 import type { CreateManagerGrantRequestDto } from '../../types/CreateManagerGrantRequestDto';
 import type { CreateCollaboratorAssignmentRequestDto } from '../../types/CreateCollaboratorsAssignmentRequestDto';
 import { BadgeManagerAssignmentTableToolbar } from '../../components/main/assignment/BadgeManagerAssignmentTableToolbar';
+import BadgeAssignmentDetailDialog from '../../components/main/assignment/BadgeAssignmentDetailDialog';
 
 type AssignmentFilter = 'manager' | 'collaborator';
 
@@ -40,7 +41,18 @@ const BadgeAssignmentPage = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { user } = useAuth(); 
-  const { managerAssignments, collaboratorAssignments, error, loading, assignToManagers, assignToCollaborators, deleteManagerAssignment, deleteCollaboratorAssignment } = useBadgeAssignments();
+  const { managerAssignments, collaboratorAssignments, error, loading, assignToManagers, assignToCollaborators, 
+    deleteManagerAssignment, deleteCollaboratorAssignment } = useBadgeAssignments();
+  const emptyAssignment: Omit<
+    RewardsBadgeAssignment,
+    'employeeNumber' | 'fullName' | 'description' | 'quantity'
+  > = {
+    id: 0,
+    comment: '',
+    assignedBy: '',
+    assignedAt: '',
+  };
+
 
   const [assignmentFilter, setAssignmentFilter] = useState<AssignmentFilter>('manager');
   const [search, setSearch] = useState('');
@@ -58,6 +70,22 @@ const BadgeAssignmentPage = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   const [openDialogType, setOpenDialogType] = useState<'admin' | 'manager' | null>(null);
+
+
+  const [openDetailDialog, setOpenDetailDialog] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState<typeof emptyAssignment>(emptyAssignment);
+
+
+  const handleOpenDetailDialog = (assignment: RewardsBadgeAssignment) => {
+    setSelectedAssignment(assignment);
+    setOpenDetailDialog(true);
+  };
+
+  const handleCloseDetailDialog = () => {
+    setOpenDetailDialog(false);
+    setSelectedAssignment(emptyAssignment);
+  };
+
 
   const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
   const [confirmDeleteAssignment, setConfirmDeleteAssignment] = useState<RewardsBadgeAssignment | null>(null);
@@ -185,7 +213,6 @@ const currentItems = useMemo(() => {
 
   const handleAssignmentFilterChange = (value: AssignmentFilter) => {
     setAssignmentFilter(value);
-    // Limpiar filtros al cambiar tab
     setSearch('');
     setCategory('all');
     setDateFrom('');
@@ -232,7 +259,7 @@ const currentItems = useMemo(() => {
   };
 
   const handleAssignToCollaborators = async (data: {
-    assignments: { userId: number; categoryId: number; points: number }[];
+    assignments: { userId: number; categoryId: number; points: number, comment: string }[];
   }) => {
 
     setLoadingCollaboratorAssign(true);
@@ -241,12 +268,13 @@ const currentItems = useMemo(() => {
         userId: a.userId,
         categoryId: a.categoryId,
         points: a.points,
+        comment: a.comment
       }));
 
       const dto: CreateCollaboratorAssignmentRequestDto = {
         assignments,
         assignedBy: user?.id ?? 0, 
-        notes: '', 
+        comment: '', 
       };
 
       const message = await assignToCollaborators(dto);
@@ -507,6 +535,29 @@ const currentItems = useMemo(() => {
                     </TableCell>
                     <TableCell>
                      <Box display="flex" gap={1}>
+                        {(user?.activeRole.id === 2 || assignmentFilter === 'collaborator') && (
+                          <Tooltip title="Ver detalle">
+                            <IconButton
+                              onClick={() => handleOpenDetailDialog(item)}
+                              sx={{
+                                bgcolor: 'common.white',
+                                border: '1.5px solid',
+                                borderColor: 'grey.400',
+                                borderRadius: 2,
+                                color: theme.palette.publicisTurquoise.main,
+                                '&:hover': {
+                                  bgcolor: 'action.focus',
+                                  color: theme.palette.publicisTurquoise.dark,
+                                  borderColor: theme.palette.publicisTurquoise.main,
+                                },
+                                transition:
+                                  'background-color 0.3s, border-color 0.3s, color 0.3s',
+                              }}
+                            >
+                              <MdOutlineVisibility size={18} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                       <Tooltip title="Eliminar">
                         <IconButton
                           onClick={() => handleOpenDeleteConfirmDialog(item)}
@@ -563,6 +614,11 @@ const currentItems = useMemo(() => {
             assigning = {loadingCollaboratorAssign}
           />
         )}
+        <BadgeAssignmentDetailDialog
+          open={openDetailDialog}
+          onClose={handleCloseDetailDialog}
+          assignment={selectedAssignment}
+        />
 
         <ConfirmDialog
           open={confirmDeleteDialogOpen}

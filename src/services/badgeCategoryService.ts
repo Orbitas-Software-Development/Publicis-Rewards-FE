@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { API_URL } from '../utils/ApiLinks';
 import type { RewardsBadgeCategory} from '../types/RewardsBadgeCategory';
+import type { RewardsBadgeSubcategory } from '../types/RewardsBadgeSubcategory';
 
 interface ErrorResponse {
   message?: string;
@@ -53,6 +54,22 @@ export async function updateBadgeCategory(id: number, dto: Omit<RewardsBadgeCate
   try {
      const response = await axios.put(`${API_URL}/BadgeCategories/${id}`, dto);
      return response.data.message;
+  } catch (error) {
+    handleBadgeCategoryError(error as AxiosError<ErrorResponse>);
+    throw error;
+  }
+}
+
+export async function updateBadgeSubcategory(
+  categoryId: number,
+  dto: Omit<RewardsBadgeSubcategory, 'minYears' | 'maxYears'>
+): Promise<string> {
+  try {
+    const response = await axios.put(
+      `${API_URL}/BadgeCategories/${categoryId}/subcategories/${dto.id}`,
+      dto
+    );
+    return response.data.message;
   } catch (error) {
     handleBadgeCategoryError(error as AxiosError<ErrorResponse>);
     throw error;

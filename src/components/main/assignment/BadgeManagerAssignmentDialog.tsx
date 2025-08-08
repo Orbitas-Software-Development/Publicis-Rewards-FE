@@ -14,7 +14,6 @@ import {
   Typography,
   Divider,
   MenuItem,
-  useTheme,
   useMediaQuery,
 } from '@mui/material';
 import { MdPersonRemove } from 'react-icons/md';
@@ -29,7 +28,7 @@ import { useAuth } from '../../../hooks/useAuth';
 type Props = {
   open: boolean;
   onClose: () => void;
-  onAssign: (data: { assignments: { userId: number; categoryId: number; points: number }[] }) => void;
+  onAssign: (data: { assignments: { userId: number; categoryId: number; points: number, comment: string }[] }) => void;
   assigning: boolean;
 };
 
@@ -40,7 +39,7 @@ type DisplayUser = {
   role: string;
 };
 
-type SelectedUser = DisplayUser & { categoryId: number | null };
+type SelectedUser = DisplayUser & { categoryId: number | null; comment: string };
 
 const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign, assigning }) => {
   const [selectedUsers, setSelectedUsers] = useState<SelectedUser[]>([]);
@@ -54,8 +53,9 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
 
   const nonAutomaticCategories = categories.filter((cat) => !cat.isAutomatic);
 
-  const muiTheme = useTheme();
-  const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down('sm'));
+
+  const isSmallScreen = useMediaQuery('(max-width:699px)');
+
 
   useEffect(() => {
     if (open && user?.id) {
@@ -73,22 +73,25 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
   }, [open, user, getManagerAvailablePoints]);
 
 
-  const handleAssign = () => {
-  const assignments = selectedUsers
-    .filter((user) => user.categoryId !== null)
-    .map((user) => {
-      const category = nonAutomaticCategories.find((cat) => cat.id === user.categoryId);
-      return {
-        userId: user.id,
-        categoryId: user.categoryId!,
-        points: category?.points ?? 0, 
-      };
-    });
 
-  if (assignments.length > 0) {
-    onAssign({ assignments });
-  }
-};
+  const handleAssign = () => {
+    const assignments = selectedUsers
+      .filter((user) => user.categoryId !== null && user.comment.trim())
+      .map((user) => {
+        const category = nonAutomaticCategories.find((cat) => cat.id === user.categoryId);
+        return {
+          userId: user.id,
+          categoryId: user.categoryId!,
+          points: category?.points ?? 0,
+          comment: user.comment.trim(),
+        };
+      });
+
+    if (assignments.length > 0) {
+      onAssign({ assignments });
+    }
+  };
+
 
 
   const handleRemoveUser = (id: number) => {
@@ -108,6 +111,12 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
     );
   };
 
+  const handleCommentChange = (id: number, value: string) => {
+    setSelectedUsers((prev) =>
+      prev.map((u) => (u.id === id ? { ...u, comment: value } : u))
+    );
+  };
+
   const totalAssigned = selectedUsers.reduce((acc, u) => {
     const category = nonAutomaticCategories.find((c) => c.id === u.categoryId);
     return acc + (category?.points || 0);
@@ -115,13 +124,14 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
 
   const remainingPoints = availablePoints - totalAssigned;
 
-  const hasError = remainingPoints < 0 || selectedUsers.some((u) => u.categoryId === null);
+  const hasError = remainingPoints < 0 || selectedUsers.some((u) => u.categoryId === null || !u.comment.trim());
+
 
    return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
       slotProps={{
         paper: {
@@ -129,6 +139,17 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
             borderRadius: 4,
             overflow: 'hidden',
             maxHeight: 'calc(100vh - 64px)',
+            width: {
+              xs: '95vw',
+              sm: '90vw',
+              md: '70vw',
+              lg: '65vw',
+              xl: '50vw' 
+            },
+            m: {
+              xs: 0,  
+              sm: 'auto',  
+            },
           },
         },
         backdrop: {
@@ -159,7 +180,7 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
             <Box display="flex" alignItems="center" gap={2}>
               <Avatar src={huella} alt="huellita" sx={{ width: {xs:40, md:50},  height: {xs:40, md:50} }} />
               <Box textAlign="left" sx={{mr:{xs:1, md: 4}}}>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" fontSize={16} mt={0} color="text.secondary">
                   Huellas disponibles
                 </Typography>
                 {loadingPoints ? (
@@ -180,14 +201,14 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
               </IconButton>
             </Box>
           </Box>
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ mt: 2, mb: selectedUsers.length > 1 ? 0 : 2 }} />
         </Box>
 
         {/* Contenido */}
         <DialogContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Box
             display="flex"
-            gap={4}
+            gap={isSmallScreen ? 1 : 4}
             flexDirection={isSmallScreen ? 'column' : 'row'}
           >
             {/* Izquierda - Selector de colaboradores */}
@@ -200,7 +221,7 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
                   if (value && !selectedUsers.find((u) => u.id === value.id)) {
                     setSelectedUsers((prev) => [
                       ...prev,
-                      { ...value, categoryId: globalCategoryId },
+                      { ...value, categoryId: globalCategoryId, comment: '' }, 
                     ]);
                   }
                 }}
@@ -290,6 +311,7 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
               <Typography variant="subtitle2" mt={1} mb={1}>
                 Colaboradores seleccionados
               </Typography>
+
               <Box
                 display="flex"
                 flexDirection="column"
@@ -298,54 +320,127 @@ const BadgeManagerAssignmentDialog: React.FC<Props> = ({ open, onClose, onAssign
                 overflow="auto"
               >
                 {selectedUsers.map((user) => (
-                  <Box
+                 <Box
                     key={user.id}
                     display="flex"
                     flexDirection={isSmallScreen ? 'column' : 'row'}
                     alignItems={isSmallScreen ? 'flex-start' : 'center'}
-                    justifyContent="space-between"
-                    sx={{ px: 2, py: 1, borderRadius: 2, bgcolor: '#f9f9f9' }}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderRadius: 2,
+                      bgcolor: '#f9f9f9',
+                      gap: 2,
+                      position: 'relative',
+                    }}
                   >
-                    <Box display="flex" alignItems="center" gap={2} width="100%">
+
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    sx={{
+                      flexBasis: isSmallScreen ? '100%' : '30%',
+                      flexGrow: 0,
+                      gap: 2,
+                    }}
+                  >
+                    {/* Avatar + Nombre, con flexGrow=1 para ocupar todo el espacio y empujar botón */}
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap={2}
+                      sx={{ 
+                        flexGrow: 1, 
+                        minWidth: 0  
+                      }}
+                    >
                       <Avatar src={user.avatarUrl}>{user.fullName[0]}</Avatar>
                       <Box>
-                        <Typography>{user.fullName}</Typography>
+                        <Typography fontWeight="medium" sx={{ wordBreak: 'break-word' }}>
+                          {user.fullName}
+                        </Typography>
                         <Typography variant="body2" color="text.secondary">
                           {user.role}
                         </Typography>
                       </Box>
                     </Box>
 
-                    <Box sx={{ width: isSmallScreen ? '100%' : 300, mt: isSmallScreen ? 1 : 0 }}>
-                      <TextField
-                        select
-                        size="small"
-                        value={user.categoryId ?? ''}
-                        onChange={(e) => handleCategoryChange(user.id, parseInt(e.target.value))}
-                        fullWidth
-                        error={user.categoryId === null}
-                      >
-                        <MenuItem value="" disabled>
-                          Seleccionar categoría
-                        </MenuItem>
-                        {nonAutomaticCategories.map((cat) => (
-                          <MenuItem key={cat.id} value={cat.id}>
-                            {cat.description} ({cat.points} huellas)
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Box>
-
-                    <Tooltip title="Eliminar">
-                      <IconButton onClick={() => handleRemoveUser(user.id)} sx={{ mt: isSmallScreen ? 1 : 0 }}>
-                        <MdPersonRemove />
-                      </IconButton>
-                    </Tooltip>
+                    {/* IconButton visible solo en pantallas pequeñas */}
+                    {isSmallScreen && (
+                      <Tooltip title="Eliminar">
+                        <IconButton onClick={() => handleRemoveUser(user.id)} size="small">
+                          <MdPersonRemove />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </Box>
+
+                    {/* Comentario */}
+                    <TextField
+                      label="Comentario"
+                      size="small"
+                      value={user.comment}
+                      onChange={(e) => handleCommentChange(user.id, e.target.value)}
+                      error={!user.comment.trim()}
+                      fullWidth={isSmallScreen}
+                      sx={{
+                        flexBasis: isSmallScreen ? '100%' : '35%',
+                        flexGrow: 0,
+                        minWidth: 150,
+                      }}
+                    />
+
+                    {/* Categoría */}
+                    <TextField
+                      select
+                      label="Categoría"
+                      size="small"
+                      value={user.categoryId ?? ''}
+                      onChange={(e) => handleCategoryChange(user.id, parseInt(e.target.value))}
+                      error={user.categoryId === null}
+                      fullWidth={isSmallScreen}
+                      sx={{
+                        flexBasis: isSmallScreen ? '100%' : '35%',
+                        flexGrow: 0,
+                        minWidth: 120,
+                      }}
+                    >
+                      <MenuItem value="" disabled>
+                        Seleccionar categoría
+                      </MenuItem>
+                      {nonAutomaticCategories.map((cat) => (
+                        <MenuItem key={cat.id} value={cat.id}>
+                          {cat.description} ({cat.points} huellas)
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
+                    {/* IconButton en pantalla grande */}
+                    {!isSmallScreen && (
+                      <Box
+                        display="flex"
+                        justifyContent="flex-end"
+                        alignItems="center"
+                        sx={{
+                          flexBasis: '5%',
+                        }}
+                      >
+                        <Tooltip title="Eliminar">
+                          <IconButton onClick={() => handleRemoveUser(user.id)} size="medium">
+                            <MdPersonRemove />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    )}
+                  </Box>
+
                 ))}
               </Box>
             </Box>
           )}
+
+
         </DialogContent>
 
         {/* Acciones */}
