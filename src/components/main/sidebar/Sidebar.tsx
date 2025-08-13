@@ -210,7 +210,7 @@ export default function Sidebar({ mobileOpen, onDrawerToggle }: SidebarProps) {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', lg: 'none' },
-          '& .MuiDrawer-paper': { width: drawerWidth, mt: '56px' },
+           '& .MuiDrawer-paper': { width: drawerWidth, top: '56px', height: 'calc(100% - 56px)' },
         }}
       >
         {drawerContent}
