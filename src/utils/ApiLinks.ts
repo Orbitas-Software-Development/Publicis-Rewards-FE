@@ -7,7 +7,7 @@ switch (env) {
     API_URL = 'https://localhost:7156/api';
     break;
   case 'production':
-    API_URL = 'https://alienrealty-backend-e9f2c9grecgjcjbz.centralus-01.azurewebsites.net/api';
+    API_URL = 'https://publicis-rewards-be.onrender.com';
     break;
   case 'testing':
     API_URL = 'https://alienrealty-backend-e9f2c9grecgjcjbz.centralus-01.azurewebsites.net/api';

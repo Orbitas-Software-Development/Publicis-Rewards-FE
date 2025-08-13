@@ -16,9 +16,6 @@ import {
 import type { UserProfile } from '../../types/UserProfile';
 import FullPageLoader from '../../components/main/utils/FullPageLoader';
 import ErrorMessage from '../../components/main/utils/ErrorMessage';
-import { CalendarMonth, Person, WorkspacePremium } from '@mui/icons-material';
-import RedeemIcon from '@mui/icons-material/Redeem';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
@@ -158,11 +155,19 @@ const UserProfilePage: React.FC = () => {
         }}
       >
         {/* Card superior - Perfil del usuario */}
-       <Card sx={{ p: 3, borderRadius: '16px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',border: `1px solid ${theme.palette.publicisGrey.main}` }}>
+       <Card 
+          sx=
+            {{ 
+              p: 3, 
+              borderRadius: '16px', 
+              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
+              border: `1px solid ${theme.palette.publicisGrey.main}`
+              ,"&:hover": {boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)"}, 
+            }}>
         <Box
             display="flex"
             flexDirection={{ xs: 'column', md: 'row' }}
-            alignItems="stretch"
+            alignItems='stretch'
             justifyContent="space-between"
             gap={{ xs: 3, md: 0 }}
         >
@@ -188,12 +193,12 @@ const UserProfilePage: React.FC = () => {
           <Box
             onClick={isOwner ? handleClickAvatar : undefined}
             sx={{
-              width: 108,
-              height: 108,
+              width: { xs: 80, sm: 96, md: 108 },
+              height: { xs: 80, sm: 96, md: 108 },
               borderRadius: '50%',
               background: (theme) =>
                 `conic-gradient(${theme.palette.publicisBlue.light}, ${theme.palette.publicisOrange.light}, ${theme.palette.publicisBlue.light})`,
-              padding: '4px',
+              padding: { xs: '3px', md: '4px' },
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -201,17 +206,23 @@ const UserProfilePage: React.FC = () => {
             }}
           >
             <Avatar
-              src={preview ?? (user.profilePictureUrl ? `${baseUrl}${user.profilePictureUrl}` : undefined)}
+              src={
+                preview ??
+                (user.profilePictureUrl
+                  ? `${baseUrl}${user.profilePictureUrl}`
+                  : undefined)
+              }
               alt={user.fullName}
               sx={{
-                width: 100,
-                height: 100,
-                fontSize: 36,
+                width: { xs: 72, sm: 88, md: 100 }, 
+                height: { xs: 72, sm: 88, md: 100 },
+                fontSize: { xs: 24, sm: 30, md: 36 }, 
               }}
             >
               {!preview && !user.profilePictureUrl && user.fullName.charAt(0)}
             </Avatar>
           </Box>
+
 
             {isOwner && (
               <>
@@ -272,77 +283,80 @@ const UserProfilePage: React.FC = () => {
 
             </Box>    
 
-            <Box display="flex" flexDirection="column" justifyContent="center" gap={0.5}>
-                <Typography fontWeight="bold" fontSize={24} lineHeight={1.2}>
-                {user.fullName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" fontSize={16} lineHeight={1.3}>
-                {user.email}
-                </Typography>
-                <Typography
-                variant="body1"
-                fontWeight="500"
-                fontSize={16}
-                lineHeight={1.3}
-                display="flex"
-                alignItems="center"
-                gap={0.5}
-                >
-                <Box component="span">Estado:</Box>
-                <Box
-                  component="span"
-                  color={
-                    user.status === 'Activo'
-                      ? 'success.main'
-                      : user.status === 'Pendiente'
-                      ? 'warning.main'
-                      : 'error.main'
-                  }
-                  fontWeight="bold"
-                >
-                  {user.status}
-                </Box>
+              <Box display="flex" flexDirection="column" justifyContent="center" gap={0.5} >
+                  <Typography fontWeight="bold" fontSize={{ xs: 18, sm: 20, md: 22, xl:24 }} lineHeight={1.2} >
+                    {user.fullName}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" fontSize={16} lineHeight={1.3}>
+                    {user.email}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    fontWeight="500"
+                    fontSize={16}
+                    lineHeight={1.3}
+                    display="flex"
+                    alignItems="center"
+                    gap={0.5}
+                  >
+                  <Box component="span">Estado:</Box>
+                  <Box
+                    component="span"
+                    color={
+                      user.status === 'Activo'
+                        ? 'success.main'
+                        : user.status === 'Pendiente'
+                        ? 'warning.main'
+                        : 'error.main'
+                    }
+                    fontWeight="bold"
+                  >
+                    {user.status}
+                  </Box>
 
-                </Typography>
-            </Box>
+                  </Typography>
+              </Box>
             </Box>
 
-            {/* Divider vertical */}
+            {/* Divider: vertical en md+, horizontal en xs/sm */}
             <Box
-            display={{ xs: 'none', md: 'block' }}
-            sx={{
-                width: '2px',
+              display={{ xs: 'block', md: 'block' }}
+              sx={{
+                width: { xs: '100%', md: '2px' },
+                height: { xs: '2px', md: 'auto' },
                 backgroundColor: 'divider',
                 borderRadius: 30,
-                mx: 2,
-            }}
+                mx: { xs: 0, md: 2 },
+                my: { xs: 0, md: 0 },
+              }}
             />
 
             {/* Sección derecha */}
           <Box
             width={{ xs: '100%', md: '51.5%' }}
             display="flex"
-            justifyContent="center"
+            justifyContent={{ xs: 'flex-start', md: 'center' }}
             alignItems="center"
+             flexWrap="wrap"
             >
             <Grid container spacing={2}>
                 <Grid size={{ xs:12, md:6}}>
-                <Typography variant="body1" align="center">
+                <Typography variant="body1" align="center" sx={{ textAlign: { xs: 'left', sm: 'center' } }}>
                     <strong>Número de empleado:</strong> {user.employeeNumber}
                 </Typography>
                 </Grid>
                 <Grid size={{ xs:12, md:6}}>
-                <Typography variant="body1" align="center">
+                <Typography variant="body1" align="center" sx={{ textAlign: { xs: 'left', sm: 'center' } }}>
                     <strong>Fecha de creación:</strong> {new Date(user.createdDate).toLocaleDateString()}
                 </Typography>
                 </Grid>
                 <Grid size={{ xs:12, md:6}}>
-                <Typography variant="body1" align="center">
+                <Typography variant="body1" align="center" sx={{ textAlign: { xs: 'left', sm: 'center' } }}>
                     <strong>Roles:</strong> {user.roles.join(', ')}
                 </Typography>
                 </Grid>
                 <Grid size={{ xs:12, md:6}}>
-                <Typography variant="body1" align="center">
+                <Typography variant="body1" align="center" sx={{ textAlign: { xs: 'left', sm: 'center' } }}>
                     <strong>Último inicio de sesión:</strong>{' '}
                       {user.lastLoginDate
                         ? new Date(user.lastLoginDate).toLocaleDateString()
@@ -365,6 +379,9 @@ const UserProfilePage: React.FC = () => {
             borderRadius: '16px',
             boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
             border: `1px solid ${theme.palette.publicisGrey.main}`,
+            "&:hover": {
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+            },
           }}
         >
           <Typography variant="h6" mb={2} fontWeight="bold">
@@ -372,33 +389,36 @@ const UserProfilePage: React.FC = () => {
           </Typography>
           <Divider sx={{ mb: 2 }} />
 
-          <Box display="flex" alignItems="center" mb={1}>
-            <CalendarMonth sx={{ mr: 1, color: 'text.secondary' }} />
-            <Typography>
-              <strong>Fecha de ingreso:</strong>{' '}
-              {new Date(user.hireDate).toLocaleDateString()}
-            </Typography>
-          </Box>
+          <Box display="flex" flexDirection="column" px={2}>
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography sx={{ mr: 1, fontWeight: 'bold'}}>
+                📅 Fecha de ingreso: {' '}
+               
+              </Typography>
+              <Typography> {new Date(user.hireDate).toLocaleDateString()}</Typography>
+            </Box>
 
-          <Box display="flex" alignItems="center" mb={1}>
-            <Person sx={{ mr: 1, color: 'text.secondary' }} />
-            <Typography>
-              <strong>Puesto:</strong> {user.position}
-            </Typography>
-          </Box>
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography sx={{ mr: 1, fontWeight: 'bold'}}>
+                👔 Puesto: 
+              </Typography>
+              <Typography>{user.position}</Typography>
+            </Box>
 
-          <Box display="flex" alignItems="center" mb={1}>
-            <Typography sx={{ mr: 1, fontWeight: 'bold', color: 'text.secondary' }}>
-              🏢 Departamento:
-            </Typography>
-            <Typography>{user.department}</Typography>
-          </Box>
 
-          <Box display="flex" alignItems="center">
-            <Typography sx={{ mr: 1, fontWeight: 'bold', color: 'text.secondary' }}>
-              👤 Supervisor:
-            </Typography>
-            <Typography>{user.supervisorName}</Typography>
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography sx={{ mr: 1, fontWeight: 'bold' }}>
+                🏢 Departamento:
+              </Typography>
+              <Typography>{user.department}</Typography>
+            </Box>
+
+            <Box display="flex" alignItems="center">
+              <Typography sx={{ mr: 1, fontWeight: 'bold'}}>
+                👤 Supervisor:
+              </Typography>
+              <Typography>{user.supervisorName}</Typography>
+            </Box>
           </Box>
         </Card>
 
@@ -411,6 +431,9 @@ const UserProfilePage: React.FC = () => {
             borderRadius: '16px',
             boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
             border: `1px solid ${theme.palette.publicisGrey.main}`,
+            "&:hover": {
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+            },
           }}
         >
           <Typography variant="h6" mb={2} fontWeight="bold">
@@ -418,35 +441,41 @@ const UserProfilePage: React.FC = () => {
           </Typography>
           <Divider sx={{ mb: 2 }} />
 
-          <Box display="flex" alignItems="center" mb={1}>
-            <WorkspacePremium sx={{ mr: 1, color: 'text.secondary' }} />
-            <Typography>
-              <strong>Huellas asignadas:</strong> {user.pointsAssigned}
-            </Typography>
-          </Box>
-
-          <Box display="flex" alignItems="center" mb={1}>
-            <RedeemIcon sx={{ mr: 1, color: 'text.secondary' }} />
-            <Typography>
-              <strong>Huellas canjeadas:</strong> {user.pointsRedeemed}
-            </Typography>
-          </Box>
-
-          <Box display="flex" alignItems="center" mb={1}>
-            <CheckCircleIcon sx={{ mr: 1, color: 'text.secondary' }} />
-            <Typography>
-              <strong>Huellas disponibles:</strong> {user.pointsAvailable}
-            </Typography>
-          </Box>
-
-          {typeof user.totalRewardsRedeemed === 'number' && (
-            <Box display="flex" alignItems="center" mb={1}>
-              <RedeemIcon sx={{ mr: 1, color: 'text.secondary' }} />
-              <Typography>
-                <strong>Total de canjes:</strong> {user.totalRewardsRedeemed}
+          <Box display="flex" flexDirection="column" px={2}>
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography sx={{ mr: 1 }}>🏆</Typography>
+              <Typography sx={{ mr: 1, fontWeight: 'bold'}}>
+                Huellas ganadas:
               </Typography>
+              <Typography>{user.pointsAssigned}</Typography>
             </Box>
-          )}
+
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography sx={{ mr: 1 }}>🎁</Typography>
+              <Typography sx={{ mr: 1, fontWeight: 'bold'}}>
+                Huellas canjeadas:
+              </Typography>
+              <Typography>{user.pointsRedeemed}</Typography>
+            </Box>
+
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography sx={{ mr: 1 }}>✅</Typography>
+              <Typography sx={{ mr: 1, fontWeight: 'bold'}}>
+                Huellas disponibles:
+              </Typography>
+              <Typography>{user.pointsAvailable}</Typography>
+            </Box>
+
+            {typeof user.totalRewardsRedeemed === 'number' && (
+              <Box display="flex" alignItems="center" mb={2}>
+                <Typography sx={{ mr: 1 }}>🎯</Typography>
+                <Typography sx={{ mr: 1, fontWeight: 'bold'}}>
+                  Total de canjes:
+                </Typography>
+                <Typography>{user.totalRewardsRedeemed}</Typography>
+              </Box>
+            )}
+          </Box>
         </Card>
 
         </Box>

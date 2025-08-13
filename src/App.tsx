@@ -6,23 +6,26 @@ import { BadgeCategoryProvider } from './contexts/BadgeCategoryContext';
 import { PrizeProvider } from './contexts/PrizeContext';
 import { BadgeAssignmentProvider } from './contexts/BadgeAssignmentContext';
 import { RedemptionProvider } from './contexts/RedemptionContext';
+import { DashboardProvider } from './contexts/DashboardContext';
 
 function App() {
   return (
     <AuthProvider>
-      <EmployeeProvider>
-        <UserProvider>
-          <BadgeCategoryProvider>
-            <PrizeProvider>
-               <BadgeAssignmentProvider>
-                  <RedemptionProvider>
-                    <AppRouter />
-                  </RedemptionProvider>  
-              </BadgeAssignmentProvider>
-            </PrizeProvider>
-          </BadgeCategoryProvider>
-        </UserProvider>
-      </EmployeeProvider>       
+      <DashboardProvider>
+        <EmployeeProvider>
+          <UserProvider>
+            <BadgeCategoryProvider>
+              <PrizeProvider>
+                <BadgeAssignmentProvider>
+                    <RedemptionProvider>
+                      <AppRouter />
+                    </RedemptionProvider>  
+                </BadgeAssignmentProvider>
+              </PrizeProvider>
+            </BadgeCategoryProvider>
+          </UserProvider>
+        </EmployeeProvider>   
+      </DashboardProvider>    
     </AuthProvider>
       
   );

@@ -16,121 +16,54 @@ import {
   XAxis,
   YAxis,
   ResponsiveContainer,
+  LineChart,
+  Line,
 } from 'recharts';
 import { useAuth } from '../../hooks/useAuth';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { useDashboard } from '../../hooks/useDashboard';
+import ErrorMessage from '../../components/main/utils/ErrorMessage';
+import FullPageLoader from '../../components/main/utils/FullPageLoader';
+import { mapDashboardData } from '../../utils/dashboardDataMapper';
+import { DashboardChartCard } from '../../components/main/dashboard/DashboardChartCard';
 
 
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
-
-const getDashboardData = (role: string) => {
-  switch (role.toLowerCase()) {
-    case 'administrador':
-      return {
-        cards: [
-          { label: 'Colaboradores Activos', value: 120, color: 'primary.main', path: '/colaboradores' },
-          { label: 'Huellas Asignadas', value: 4520, color: 'error.main', path: '/huellas' },
-          { label: 'Canjes Realizados', value: 98, color: 'secondary.main', path: '/canjes' },
-          { label: 'Premios Disponibles', value: 34, color: 'success.main', path: '/premios' },
-        ],
-        pieData: [
-          { name: 'Reconocimiento', value: 300 },
-          { name: 'Antigüedad', value: 100 },
-          { name: 'Programas', value: 50 },
-        ],
-        barData: [
-          { name: 'Ene', canjes: 20 },
-          { name: 'Feb', canjes: 30 },
-          { name: 'Mar', canjes: 25 },
-        ],
-      };
-    case 'supervisor':
-      return {
-        cards: [
-          { label: 'Miembros del equipo', value: 10, color: 'primary.main', path: '/equipo' },
-          { label: 'Huellas disponibles', value: 800, color: 'error.main', path: '/huellas' },
-          { label: 'Reconocimientos hechos', value: 15, color: 'secondary.main', path: '/historial' },
-          { label: 'Premios canjeados por equipo', value: 8, color: 'success.main', path: '/canjes' },
-        ],
-        pieData: [
-          { name: 'Carlos', value: 5 },
-          { name: 'Ana', value: 3 },
-          { name: 'Luis', value: 2 },
-        ],
-        barData: [
-          { name: 'Ene', huellas: 100 },
-          { name: 'Feb', huellas: 150 },
-          { name: 'Mar', huellas: 90 },
-        ],
-      };
-    case 'manager':
-      return {
-        cards: [
-          { label: 'Miembros del equipo', value: 10, color: 'primary.main', path: '/equipo' },
-          { label: 'Huellas disponibles', value: 800, color: 'error.main', path: '/huellas' },
-          { label: 'Reconocimientos hechos', value: 15, color: 'secondary.main', path: '/historial' },
-          { label: 'Premios canjeados por equipo', value: 8, color: 'success.main', path: '/canjes' },
-        ],
-        pieData: [
-          { name: 'Carlos', value: 5 },
-          { name: 'Ana', value: 3 },
-          { name: 'Luis', value: 2 },
-        ],
-        barData: [
-          { name: 'Ene', huellas: 100 },
-          { name: 'Feb', huellas: 150 },
-          { name: 'Mar', huellas: 90 },
-        ],
-    };
-    case 'colaborador':
-      return {
-        cards: [
-          { label: 'Huellas Disponibles', value: 320, color: 'primary.main', path: '/huellas' },
-          { label: 'Huellas Canjeadas', value: 180, color: 'error.main', path: '/historial' },
-          { label: 'Canjes Realizados', value: 3, color: 'secondary.main', path: '/canjes' },
-          { label: 'Premios Favoritos', value: 2, color: 'success.main', path: '/catalogo' },
-        ],
-        pieData: [
-          { name: 'Gift Card', value: 1 },
-          { name: 'Camiseta', value: 1 },
-          { name: 'Taza', value: 1 },
-        ],
-        barData: [
-          { name: '2023', huellas: 180 },
-          { name: '2024', huellas: 320 },
-        ],
-      };
-    default:
-      return { cards: [], pieData: [], barData: [] };
-  }
-};
+const COLORS = ['#16ABE0', '#22C55E', '#FC8B3C', '#CC0028'];
 
 export default function HomePage() {
   const { user } = useAuth();
+  const { data, loading, error } = useDashboard();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
 
-  if (!user) {
+  if (loading) return <FullPageLoader />;
+  if (error) return <ErrorMessage message={error} />;
+  if (!user || !data)
     return (
       <Typography textAlign="center" mt={10}>
         Cargando...
       </Typography>
     );
-  }
 
   const role = user.activeRole.name?.toLowerCase() || 'colaborador';
-  const { cards, pieData, barData } = getDashboardData(role);
+  const { cards, pieDataAdmin, pieDataManager, pieDataCollaborator, barDataPeopleByArea, barDataPointsByArea, barDataPointsByYear,
+     barDataRedemptionsByMonth, barDataSummary, barDataTopPrizes, barDataMonthlyRedemptionsByTeam } = mapDashboardData(role, data);
 
-  return (
+
+
+ return (
     <Box sx={{ 
       flexGrow: 1, 
       p:{xs:2, md:3},
       display: 'flex', 
       flexDirection: 'column', 
-      height: isDesktop ? '100%' : 'auto',
+      height:  'auto',
       gap: 3,
-      overflow: isDesktop ? 'hidden' : 'visible'
+      overflowY: isDesktop
+      ? role !== 'colaborador'
+        ? 'visible'  
+        : 'hidden'    
+      : 'visible',
     }}>
 
       {/* Título (20%) */}
@@ -159,11 +92,10 @@ export default function HomePage() {
       <Box
         sx={{
           flexGrow: isDesktop ? 1 : undefined,
-          flexBasis: isDesktop ? '25%' : undefined,
+          flexBasis: isDesktop ? (role !== 'colaborador' ? '17%' : '25%') : undefined,
           px: 2,
         }}
       >
-
         <Grid container spacing={3} sx={{  height: isDesktop ? '100%' : 'auto', }}>
           {cards.map(({ label, value, color, path }) => (
             <Grid size={{ xs: 12, sm: 6, md: 3 }} key={label}>
@@ -229,70 +161,373 @@ export default function HomePage() {
         </Grid>
       </Box>
 
-      {/* Gráficos */}
+       {/* Gráficos */}
       <Box
         sx={{
-          flexGrow: isDesktop ? 2 : undefined,
-          flexBasis: isDesktop ? '55%' : undefined,
+          flexGrow: isDesktop ? (role !== 'colaborador' ? undefined : 2) : undefined,
+          flexBasis: isDesktop ? (role !== 'colaborador' ? undefined : '55%') : undefined,
           px: 2,
           overflow: isDesktop ? 'hidden' : 'visible',
-          mb: isDesktop ? 0 : 4,
+          mb: isDesktop ? 0 : 2,
+          pb: isDesktop ?  (role !== 'colaborador' ? 9  : 1) : 0
         }}
       >
+        <Grid
+          container
+          spacing={3}
+          sx={{ height: role !== 'colaborador' && isDesktop ? 'auto' : isDesktop ? '98%' : 'auto' }}
+        >
+          {role === 'administrador' && (
+            <>
+              {/* Gráfico 1 - Pie */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                <DashboardChartCard
+                 title="% de huellas disponibles por rango para canjear"
+                  empty={pieDataAdmin.length === 0}
+                >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart margin={{ top: 10, right: 0, left: 0, bottom: 30 }}>
+                        <Pie
+                          data={pieDataAdmin}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={110}
+                          label={({ name, percent }) => {
+                            if (!percent) return `${name}: 0%`;
+                            const formatted = (percent * 100).toFixed(2);
+                            const trimmed = formatted.replace(/\.?0+$/, '');
+                            return `${name}: ${trimmed}%`;
+                          }}
 
-        <Grid container spacing={3} sx={{  height: isDesktop ? '98%' : 'auto' }}>
-          <Grid size={{ xs: 12, md: 6 }} sx={{  height: isDesktop ? '100%' : 'auto' }}>
-            <Card sx={{  height: isDesktop ? '100%' : 'auto', display: 'flex', flexDirection: 'column',  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',borderRadius: 3,border: '1px solid rgba(0, 0, 0, 0.1)'}}>
-              <CardContent sx={{ textAlign: 'center', flexShrink: 0 }}>
-                <Typography variant="h6" gutterBottom>
-                  Distribución de Huellas
-                </Typography>
-              </CardContent>
-              <Box sx={{ flexGrow: 1, minHeight: 0 }}>
-                <ResponsiveContainer width="100%" height={isDesktop ? '100%' : 300}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={100}
-                      label
+                        >
+                          {pieDataAdmin.map((_entry, index) => (
+                            <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={(value: number, name: string) =>{
+                            const percent = value ?? 0;
+                            const formattedValue = percent.toFixed(2).replace(/\.?0+$/, '');
+
+                            return [`${formattedValue}% de colaboradores en este rango`, name]
+                          }}
+                          separator=" - "
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                </DashboardChartCard>              
+              </Grid>
+
+              {/* Gráfico 2 - Bar (Canjes por mes) */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                  <DashboardChartCard
+                    title="Canjes por Mes"
+                    empty={barDataRedemptionsByMonth.length === 0}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={barDataRedemptionsByMonth} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
+                        <XAxis
+                          dataKey="name"
+                          tickFormatter={(month) => month.substring(0, 3)} 
+                        />
+                        <YAxis />
+                        <Tooltip />
+                        <Line
+                          type="monotone"
+                          dataKey="canjes"
+                          stroke={theme.palette.publicisPurple.main}
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                      </LineChart>
+                  </ResponsiveContainer>
+                </DashboardChartCard> 
+              </Grid>
+
+              {/* Gráfico 3 - Bar (Frecuencia por categoría) */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                  <DashboardChartCard
+                    title="Top 5 Premios Más Canjeados"
+                    empty={barDataTopPrizes.length === 0}
+                  >         
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      layout="vertical"
+                      data={barDataTopPrizes}
+                      margin={{ top: 0, right: 30, bottom: 10, left: 40 }}
                     >
-                      {pieData.map((entry, index) => (
-                        <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Box>
-            </Card>
-          </Grid>
+                      <XAxis type="number" />
+                      <YAxis dataKey="code" type="category" />
+                      <Tooltip
+                        labelFormatter={(code) => `Código: ${code}`}
+                        formatter={(value, _name, props) => {
+                          const { payload } = props;
+                          return [
+                            `Canjes: ${value}`,
+                            `Descripción: ${payload.name}`,
+                          ];
+                        }}
+                      />
+                      <Bar dataKey="count" fill={theme.palette.publicisTurquoise.main} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </DashboardChartCard>  
+              </Grid>
 
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card sx={{ height: isDesktop ? '100%' : 'auto', display: 'flex', flexDirection: 'column', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',borderRadius: 3,border: '1px solid rgba(0, 0, 0, 0.1)' }}>
-              <CardContent sx={{ textAlign: 'center', flexShrink: 0 }}>
-                <Typography variant="h6" gutterBottom>
-                  Canjes / Huellas por Mes o Año
-                </Typography>
-              </CardContent>
-              <Box sx={{ flexGrow: 1, minHeight: 0 }}>
-                <ResponsiveContainer width="100%" height={isDesktop ? '98%' : 300}>
-                  <BarChart data={barData}>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar
-                      dataKey={'canjes' in barData[0] ? 'canjes' : 'huellas'}
-                      fill="#8884d8"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
-            </Card>
-          </Grid>
+              {/* Gráfico 4 - Bar (Asignadas vs Canjeadas) */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                  <DashboardChartCard
+                    title="Huellas Asignadas vs Canjeadas"
+                    empty={barDataSummary.length === 0}
+                  >               
+                  <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={barDataSummary} margin={{ top: 0, right: 20, left: 10, bottom: 10 }}>
+                        <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="Asignadas" fill={theme.palette.publicisPurple.main} />
+                      <Bar dataKey="Canjeadas" fill={theme.palette.publicisOrange.main} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </DashboardChartCard>  
+              </Grid>
+            </>
+            )}
+
+          {(role === 'manager' || role === 'supervisor') && (
+            <>
+              {/* Vista original para Manager/Supervisor */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                  <DashboardChartCard
+                    title="Personas a Cargo por Área"
+                    empty={barDataPeopleByArea.length === 0}
+                  >         
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={barDataPeopleByArea}
+                        margin={{ top: 0, right: 20, left: 10, bottom: 10 }}
+                      >
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => [`${value}`, 'Personas']} />
+                        <Bar dataKey="count" fill={theme.palette.primary.main} />
+                      </BarChart>
+                    </ResponsiveContainer>         
+                </DashboardChartCard>  
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
+                  <DashboardChartCard
+                    title= {role === 'manager'
+                        ? 'Huellas Asignadas por Categoría'
+                        : 'Huellas Ganadas por Categoría'}
+                    empty={pieDataManager.length === 0}
+                  >      
+
+                  <ResponsiveContainer height="100%">
+                    <PieChart margin={{ top: 30, right: 0, left: 0, bottom: 30 }}>
+                      <Pie
+                        data={pieDataManager}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={'80%'}
+                        label={({ name, percentage }) => {
+                          if (!percentage) return `${name}: 0%`;
+                          const formatted = percentage.toFixed(2);
+                          const trimmed = formatted.replace(/\.?0+$/, '');
+                          return `${name}: ${trimmed}%`;
+                        }}
+                      >
+                        {pieDataManager.map((_entry, index) => (
+                          <Cell
+                            key={index}
+                            fill={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value, name, props) => {
+                          const data = props?.payload;
+                          if (!data) return [`${value} huellas`, name];
+
+                          const percent = data.percentage ?? 0;
+                          const formattedPercent = percent.toFixed(2).replace(/\.?0+$/, '');
+
+                          return [`${value} huellas`, `${name} - ${formattedPercent}%`];
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </DashboardChartCard>  
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
+                <DashboardChartCard
+                  title="Canjes Realizados por Mes"
+                  empty={barDataMonthlyRedemptionsByTeam.length === 0}
+                >                       
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={barDataMonthlyRedemptionsByTeam} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
+                      <XAxis
+                        dataKey="name"
+                        tickFormatter={(month) => month.substring(0, 3)} 
+                      />
+                      <YAxis />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey="canjes"
+                        stroke={theme.palette.publicisPurple.main}
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </DashboardChartCard>  
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
+                <DashboardChartCard
+                  title= {role === 'manager'
+                      ? 'Huellas Asignadas por Área'
+                      : 'Huellas Ganadas por Área'}
+                  empty={barDataMonthlyRedemptionsByTeam.length === 0}
+                >     
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={barDataPointsByArea} margin={{ top: 0, right: 20, left: 10, bottom: 10 }}>
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                          <Tooltip formatter={(value) => [`${value}`, role === 'manager' ? 'Huellas asignadas' : 'Huellas ganadas']} />
+                      <Bar dataKey="points" fill={theme.palette.publicisPurple.main} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </DashboardChartCard>  
+              </Grid>
+            </>
+          )}
+          {(role === 'colaborador') && (
+          <>
+           {/* Vista original para Colaborador */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
+                    borderRadius: 3,
+                    '&:hover': {
+                      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)', 
+                    },
+                  }}
+                >
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <Typography variant="h6" gutterBottom>
+                      Huellas Ganadas por Categoría
+                    </Typography>
+                  </CardContent>
+                   <Box sx={{ flexGrow: 1, px: 2, height: isDesktop ? '100%' : 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    {pieDataCollaborator.length === 0 ? (
+                      <Typography variant="subtitle1" color="text.secondary" textAlign="center">
+                        No hay datos disponibles para mostrar.
+                      </Typography>
+                    ) : (
+                      <ResponsiveContainer height="100%" width="100%">
+                        <PieChart margin={{ top: 30, right: 0, left: 0, bottom: 30 }}>
+                          <Pie
+                            data={pieDataCollaborator}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={'80%'}
+                            label={({ name, percent }) => {
+                            if (!percent) return `${name}: 0%`;
+                            const formatted = (percent * 100).toFixed(2);
+                            const trimmed = formatted.replace(/\.?0+$/, '');
+                            return `${name}: ${trimmed}%`;
+                          }}
+                          >
+                            {pieDataCollaborator.map((_entry, index) => (
+                              <Cell
+                                key={index}
+                                fill={COLORS[index % COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            formatter={(value, name, props) => {
+                              const data = props?.payload;
+                              if (!data) return [`${value} huellas`, name];
+
+
+                              const percent = data.percentage ?? 0;
+                              const formattedPercent = percent.toFixed(2).replace(/\.?0+$/, '');
+
+                              return [`${value} huellas`, `${name} - ${formattedPercent}%`];
+                            }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    )}
+                  </Box>
+
+                </Card>
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.06)',
+                    borderRadius: 3,
+                    '&:hover': {
+                      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)', 
+                    },
+                  }}
+                >
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <Typography variant="h6" gutterBottom>
+                    Canjes Realizados por Año
+                  </Typography>
+                </CardContent>
+                <Box sx={{ flexGrow: 1, height: isDesktop ? '98%' : 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  {barDataPointsByYear.length === 0 ? (
+                    <Typography variant="subtitle1" color="text.secondary" textAlign="center">
+                      No hay datos disponibles para mostrar.
+                    </Typography>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={barDataPointsByYear}
+                        margin={{ top: 0, right: 20, left: 10, bottom: 10 }}
+                      >
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip
+                          formatter={(value, _name, props) => {
+                            const points = props.payload?.points ?? 0;
+                            return [`${value} canjes / ${points} huellas`];
+                          }}
+                        />
+                        <Bar
+                          dataKey="value"
+                          fill={theme.palette.publicisPurple.main}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </Box>
+              </Card>
+            </Grid>
+          </>
+           )}
         </Grid>
       </Box>
     </Box>

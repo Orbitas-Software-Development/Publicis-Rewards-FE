@@ -44,12 +44,13 @@ export default function MainHeader({ onMenuClick, sidebarOpen }: MainHeaderProps
             alignItems: 'center',
             justifyContent: 'space-between',
             minHeight: { xs: 56, lg: 64 },
+            p:0
           }}
         >
           {/* Left Area */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {!isDesktop && (
-              <IconButton onClick={onMenuClick}>
+              <IconButton onClick={onMenuClick} sx={{ p: {xs: 0, md: 0} }}>
                 <Icon
                   icon={sidebarOpen ? 'mdi:menu-open' : 'mdi:menu'}
                   width={28}
