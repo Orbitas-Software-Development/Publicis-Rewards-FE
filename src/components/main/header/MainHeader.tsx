@@ -44,13 +44,12 @@ export default function MainHeader({ onMenuClick, sidebarOpen }: MainHeaderProps
             alignItems: 'center',
             justifyContent: 'space-between',
             minHeight: { xs: 56, lg: 64 },
-            p:0
           }}
         >
           {/* Left Area */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {!isDesktop && (
-              <IconButton onClick={onMenuClick} sx={{ p: {xs: 0, md: 0} }}>
+              <IconButton onClick={onMenuClick} sx={{ p: {xs: 0, sm:1, md: 2} }}>
                 <Icon
                   icon={sidebarOpen ? 'mdi:menu-open' : 'mdi:menu'}
                   width={28}
@@ -62,7 +61,7 @@ export default function MainHeader({ onMenuClick, sidebarOpen }: MainHeaderProps
           </Box>
 
           {/* Right Area */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' , pr:{xs:1,sm:1, md:2}}}>
             <Box sx={{ mr: 0.5 }}>
               <LanguagePopover />
             </Box>

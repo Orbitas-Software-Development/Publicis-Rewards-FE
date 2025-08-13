@@ -4,7 +4,7 @@ const env = import.meta.env.MODE;
 
 switch (env) {
   case 'development':
-    API_URL = 'https://localhost:7156/api';
+    API_URL = 'http://localhost:5036/api';
     break;
   case 'production':
     API_URL = 'https://publicis-rewards-be.onrender.com/api';
