@@ -24,7 +24,7 @@ interface RedemptionContextType {
   loading: boolean;
   error: string | null;
   refresh: () => void;
-  updateStatus: (dto: { id: number; status: string }) => Promise<string>;
+  updateStatus: (dto: { id: number; status: string, changedByUserId: number }) => Promise<string>;
 }
 
 const RedemptionContext = createContext<RedemptionContextType>({} as RedemptionContextType);
@@ -61,16 +61,32 @@ export function RedemptionProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-   const updateStatus = useCallback(
-    async (dto: { id: number; status: string }): Promise<string> => {
-     const message =  await updateRedemptionStatus(dto);
-      setHistory(prev =>
-        prev.map(item => (item.id === dto.id ? { ...item, status: dto.status } : item))
-      );
-      return message;
-    },
-    []
-  );
+    const updateStatus = useCallback(
+      async (dto: { id: number; status: string; changedByUserId: number }): Promise<string> => {
+        try {
+          const { data: updatedItem, message } = await updateRedemptionStatus(dto);
+          
+          setHistory(prev =>
+            prev.map(item =>
+              item.id === dto.id 
+                ? { 
+                    ...item, 
+                    status: updatedItem.status, 
+                    changedBy: updatedItem.changedBy,
+                    changedAt: updatedItem.changedAt
+                  }
+                : item
+            )
+          );
+          
+          return message;
+        } catch (err) {
+          // Manejo de errores adecuado
+          throw err instanceof Error ? err : new Error('Error al actualizar el estado');
+        }
+      },
+      []
+    );
 
 
   useEffect(() => {

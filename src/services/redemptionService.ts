@@ -24,10 +24,13 @@ export async function fetchUserRedemptionHistory(userId: number): Promise<UserRe
   }
 }
 
-export async function updateRedemptionStatus(dto: RedemptionUpdateDto): Promise<string> {
+export async function updateRedemptionStatus(dto: RedemptionUpdateDto): Promise<{data: RedemptionsHistoryDto; message: string }> {
   try {
-     const response = await axios.put(`${API_URL}/Redemption/update-status`, dto);
-     return response.data.message;
+    const response = await axios.put(`${API_URL}/Redemption/update-status`, dto);
+    return {
+      data: response.data.data,
+      message: response.data.message,
+    };
   } catch (error) {
     handleRedemptionError(error as AxiosError);
     throw error;

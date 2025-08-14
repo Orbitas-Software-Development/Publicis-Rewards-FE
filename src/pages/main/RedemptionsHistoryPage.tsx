@@ -17,6 +17,7 @@ import {
 import ErrorMessage from '../../components/main/utils/ErrorMessage';
 import FullPageLoader from '../../components/main/utils/FullPageLoader';
 //import { RiDeleteBin6Line } from "react-icons/ri";
+import {MdOutlineVisibility} from 'react-icons/md';
 import TableCardContainer from '../../components/main/table/TableCardContainer';
 import Pagination from '../../components/main/table/Pagination';
 import { useMemo, useState } from 'react';
@@ -26,10 +27,11 @@ import { API_URL } from '../../utils/ApiLinks';
 import { useRedemptions } from '../../hooks/useRedemptions';
 import { RedemptionHistoryTableToolbar } from '../../components/main/redemption/RedemptionHistoryTableToolbar';
 import { useAuth } from '../../hooks/useAuth';
-import { FaEdit } from 'react-icons/fa';
+import { FaEdit} from 'react-icons/fa';
 import type { RedemptionsHistoryDto, RedemptionUpdateDto } from '../../types/RedemptionsHistoryDto';
 import RedemptionStatusDrawer from '../../components/main/redemption/RedemptionStatusDrawer';
 import AnimatedSnackbar from '../../components/main/utils/AnimatedSnackbar';
+import RedemptionDetailDialog from '../../components/main/redemption/RedemptionDetailDialog';
 
 type OrderByOption = 'id' | 'employeeNumber' | 'userName'  | 'prizeName' | 'cost' | 'status' | 'date';
 
@@ -39,6 +41,8 @@ const RedemptionsHistoryPage = () => {
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { history, loading, error, updateStatus} = useRedemptions();
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDetailDialog, setOpenDetailDialog] = useState(false);
+  const [detailRedemption, setDetailRedemption] = useState<RedemptionsHistoryDto | null>(null);
   const [editingRedemption, setEditingRedemption] = useState<RedemptionsHistoryDto | null>(null);
   const [formData, setFormData] = useState<RedemptionUpdateDto>({
     id: 0,
@@ -50,6 +54,19 @@ const RedemptionsHistoryPage = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
+
+
+  const handleOpenDetailDialog = (redemption: RedemptionsHistoryDto) => {
+    setDetailRedemption(redemption);
+    setOpenDetailDialog(true);
+  };
+
+  // Handle para cerrar el diálogo de detalle
+  const handleCloseDetailDialog = () => {
+    setDetailRedemption(null);
+    setOpenDetailDialog(false);
+  };
+
 
 
   /*
@@ -178,7 +195,7 @@ const RedemptionsHistoryPage = () => {
     if (!editingRedemption) return;
 
     try {
-      const message = await updateStatus({ id: editingRedemption.id, status: newStatus });
+      const message = await updateStatus({ id: editingRedemption.id, status: newStatus, changedByUserId: user!.id });
 
       showSnackbar(message, 'success');
 
@@ -467,55 +484,56 @@ const RedemptionsHistoryPage = () => {
                             {redemption.status}
                         </Box>
                         </TableCell>
-                        {isAdmin && 'employeeNumber' in redemption && ( 
-                          <TableCell>
+                        {isAdmin && 'employeeNumber' in redemption && (
+                        <TableCell>
                           <Box display="flex" gap={1}>
-                            <Tooltip title="Cambiar estado">
-                              <IconButton
-                                onClick={() => handleOpen(redemption)}
-                                sx={{
-                                  bgcolor: 'common.white', 
-                                  border: '1.5px solid',
-                                  borderColor: 'grey.400',
-                                  borderRadius: 2,
-                                  color: 'primary.main',
-                                  '&:hover': {
-                                    bgcolor: 'action.selected',
-                                    color: 'primary.dark',
-                                    borderColor: 'primary.main',
-                                  },
-                                  transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
-                                }}
-                              >
-                                <FaEdit size={18} />
-                              </IconButton>
-                            </Tooltip>
-
-                            {/*
-                            <Tooltip title="Eliminar">
-                              <IconButton
-                                onClick={() => handleOpenDeleteConfirmDialog(prize)}
-                                sx={{
-                                  bgcolor: 'common.white',
-                                  border: '1.5px solid',
-                                  borderColor: 'grey.400',
-                                  borderRadius: 2,
-                                  color: 'error.main',
-                                  '&:hover': {
-                                    bgcolor: 'error.light',
-                                    color: 'error.dark',
-                                    borderColor: 'error.main',
-                                  },
-                                  transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
-                                }}
-                              >
-                                <RiDeleteBin6Line size={18} />
-                              </IconButton>
-                            </Tooltip>
-                            */}
+                            {redemption.status === 'Pendiente' ? (
+                              <Tooltip title="Cambiar estado">
+                                <IconButton
+                                  onClick={() => handleOpen(redemption)}
+                                  sx={{
+                                    bgcolor: 'common.white', 
+                                    border: '1.5px solid',
+                                    borderColor: 'grey.400',
+                                    borderRadius: 2,
+                                    color: 'primary.main',
+                                    '&:hover': {
+                                      bgcolor: 'action.selected',
+                                      color: 'primary.dark',
+                                      borderColor: 'primary.main',
+                                    },
+                                    transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
+                                  }}
+                                >
+                                  <FaEdit size={18} />
+                                </IconButton>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip title="Ver detalle">
+                                <IconButton
+                                  onClick={() => handleOpenDetailDialog(redemption)}
+                                  sx={{
+                                    bgcolor: 'common.white', 
+                                    border: '1.5px solid',
+                                    borderColor: 'grey.400',
+                                    borderRadius: 2,
+                                    color: 'info.main',
+                                    '&:hover': {
+                                      bgcolor: 'action.selected',
+                                      color: 'info.dark',
+                                      borderColor: 'info.main',
+                                    },
+                                    transition: 'background-color 0.3s, border-color 0.3s, color 0.3s',
+                                  }}
+                                >
+                                  <MdOutlineVisibility size={18} />
+                                </IconButton>
+                              </Tooltip>
+                            )}
                           </Box>
                         </TableCell>
                       )}
+
                     </TableRow>
                   );
                 })
@@ -542,6 +560,11 @@ const RedemptionsHistoryPage = () => {
         userName={editingRedemption?.userName ?? ''}
         currentStatus={formData.status}
         onSave={handleSave}
+      />
+      <RedemptionDetailDialog
+        open={openDetailDialog}
+        onClose={handleCloseDetailDialog}
+        redemption={detailRedemption}
       />
 
  

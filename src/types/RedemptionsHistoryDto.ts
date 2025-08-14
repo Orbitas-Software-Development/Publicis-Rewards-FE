@@ -7,6 +7,8 @@ export interface RedemptionsHistoryDto {
   pointsUsed: number;
   redeemedAt: string;
   status: string;
+  changedBy: string | null
+  changedAt: string | null
 }
 
 export interface RedemptionUpdateDto {
